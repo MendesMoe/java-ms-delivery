@@ -1,0 +1,11 @@
+services:
+  mysql:
+    image: mysql:latest
+    restart: always
+    environment:
+      MYSQL_DATABASE: 'deliverydb'
+      MYSQL_USER: 'deliveryuser'
+      MYSQL_PASSWORD: '12345'
+      MYSQL_ROOT_PASSWORD: '54321'
+    ports:
+      - '3308:3306'
