@@ -56,8 +56,8 @@ public class DeliveryController {
             Delivery delivery = deliveryGateway.findDelivery(deliveryDTO.getId());
             Delivery deliveryNew = new Delivery(deliveryDTO);
 
-            delivery.setDeliveryManName(deliveryNew.getDeliveryManName() != null ?
-                    deliveryNew.getDeliveryManName() : delivery.getDeliveryManName());
+            delivery.setIdDeliveryMan(deliveryNew.getIdDeliveryMan() != null ?
+                    deliveryNew.getIdDeliveryMan() : delivery.getIdDeliveryMan());
 
             delivery.setStatus(deliveryNew.getStatus() != 0 ?
                     deliveryNew.getStatus() : delivery.getStatus());
@@ -77,7 +77,6 @@ public class DeliveryController {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
         }
     }
-
 
     @GetMapping
     @Operation(summary = "Request for list all delivery", responses = {
@@ -101,5 +100,16 @@ public class DeliveryController {
             return new ResponseEntity<>(delivery, HttpStatus.OK);
         }
         return new ResponseEntity<>("Entrega não encontrado.", HttpStatus.NOT_FOUND);
+    }
+
+
+    @GetMapping("/best_route/{idDeliveryMan}")
+    @Operation(summary = "Request for list all delivery by best route", responses = {
+            @ApiResponse(description = "Delivery's list", responseCode = "200"),
+    })
+    public ResponseEntity<List<Delivery>> listAllDeliverysBestRoute(@PathVariable String idDeliveryMan ) {
+        log.info("Get Best Route");
+        List<Delivery> delivery = deliveryGateway.findDeliverysByIdDeliveryMan(idDeliveryMan);
+        return new ResponseEntity<>(delivery, HttpStatus.OK);
     }
 }

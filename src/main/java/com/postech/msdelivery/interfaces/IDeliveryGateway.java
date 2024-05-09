@@ -14,4 +14,6 @@ public interface IDeliveryGateway {
     public Delivery findDelivery(String strId);
 
     public List<Delivery> listAllDeliverys();
+
+    public List<Delivery> findDeliverysByIdDeliveryMan(String idDeliveryMan);
 }

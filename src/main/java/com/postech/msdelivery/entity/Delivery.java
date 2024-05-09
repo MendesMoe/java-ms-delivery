@@ -1,6 +1,7 @@
 package com.postech.msdelivery.entity;
 
 import com.postech.msdelivery.dto.DeliveryDTO;
+import com.postech.msdelivery.usecase.DeliveryUseCase;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -20,10 +21,12 @@ public class Delivery {
     @GeneratedValue(strategy = GenerationType.UUID)
     private UUID id;
     private UUID idOrder;
-    private String deliveryManName;
+    private UUID idDeliveryMan;
     private int status;
     @Transient
     private String statusDescription;
+    @Transient
+    private String cepCustomer;
     private LocalDateTime deliveryStartDate;
     private LocalDateTime expectedDeliveryEndDate;
 
@@ -48,7 +51,7 @@ public class Delivery {
     public Delivery(DeliveryDTO deliveryDTO) {
         this.id = UUID.randomUUID();
         this.idOrder = UUID.fromString(deliveryDTO.getIdOrder());
-        this.deliveryManName = deliveryDTO.getDeliveryManName();
+        this.idDeliveryMan = UUID.fromString(deliveryDTO.getIdDeliveryMan());
         this.status = deliveryDTO.getStatus();
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
         this.deliveryStartDate = LocalDateTime.parse(deliveryDTO.getDeliveryStartDate(), formatter);

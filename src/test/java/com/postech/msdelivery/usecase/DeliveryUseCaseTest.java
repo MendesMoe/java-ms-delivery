@@ -20,10 +20,7 @@ public class DeliveryUseCaseTest {
 
     @Test
     void testValidateInsertDelivery_ClientNotFound_ThrowsException() {
-        // Arrange
         Delivery delivery = new Delivery();
-
-        // Act & Assert
         assertThrows(HttpClientErrorException.class, () -> DeliveryUseCase.validateInsertDelivery(delivery));
     }
 

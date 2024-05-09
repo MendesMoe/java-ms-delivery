@@ -1,6 +1,6 @@
 # ms-delivery
 
-Este projeto é uma API desenvolvida com Java e Spring Boot, designada para Gerenciamento de Entregas com integração com a API ms-orders 
+Este projeto é uma API desenvolvida com Java e Spring Boot, designada para Gerenciamento de Entregas com integração com as API's ms-customers e ms-orders 
 
 ## Tecnologias Utilizadas
 

@@ -17,6 +17,7 @@ public class SecurityConfigurations {
                 .csrf(AbstractHttpConfigurer::disable)
                 .authorizeHttpRequests(authz -> authz
                         .requestMatchers(
+                                "/deliveryman", "/deliveryman/**", "/deliveryman/best_route/**",
                                 "/delivery", "/delivery/**",
                                 "/swagger-ui/**", "/v3/api-docs",
                                 "/v3/api-docs/**", "/swagger-resources/**",

@@ -12,7 +12,7 @@ public class DeliveryDTO {
     private String id;
     @NotNull
     private String idOrder;
-    private String deliveryManName;
+    private String idDeliveryMan;
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     private String deliveryStartDate;
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
@@ -20,7 +20,7 @@ public class DeliveryDTO {
     private int status;
     public DeliveryDTO(String idOrder) {
         this.idOrder = idOrder;
-        this.deliveryManName = "";
+        this.idDeliveryMan = null;
         this.deliveryStartDate = "2000-01-01 00:00:00";
         this.expectedDeliveryEndDate = "2000-01-01 00:00:00";
         this.status = 0;
