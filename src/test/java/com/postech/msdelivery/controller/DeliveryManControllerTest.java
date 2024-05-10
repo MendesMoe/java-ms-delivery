@@ -37,7 +37,7 @@ class DeliveryManControllerTest {
     @Nested
     class CreatetDeliveryMan {
         @Test
-        void devePermitirRegistrarCliente() throws Exception {
+        void devePermitirRegistrarEntregador() throws Exception {
             // Arrange
             DeliveryManDTO deliveryManDTO = new DeliveryManDTO();
             deliveryManDTO.setName("John Doe");
@@ -52,7 +52,7 @@ class DeliveryManControllerTest {
         }
 
         @Test
-        void deveGerarExcecaoQuandoRegistrarClienteNomeNulo() throws Exception {
+        void deveGerarExcecaoQuandoRegistrarEntregadorNomeNulo() throws Exception {
             // Arrange
             DeliveryManDTO DeliveryManDTO = new DeliveryManDTO();
 
@@ -67,7 +67,7 @@ class DeliveryManControllerTest {
     @Nested
     class ReadDeliveryMan {
         @Test
-        void devePermitirPesquisarUmCliente() throws Exception {
+        void devePermitirPesquisarUmEntregador() throws Exception {
             // Arrange
             String DeliveryManId = "123";
             DeliveryMan DeliveryMan = new DeliveryMan();
@@ -82,7 +82,7 @@ class DeliveryManControllerTest {
         }
 
         @Test
-        void devePermitirListarTodosClientes() throws Exception {
+        void devePermitirListarTodosEntregadors() throws Exception {
             // Arrange
             List<DeliveryMan> DeliveryMans = new ArrayList<>();
             DeliveryMans.add(new DeliveryMan());
@@ -99,7 +99,7 @@ class DeliveryManControllerTest {
         }
 
         @Test
-        void deveGerarExcecaoSeNaoEncontrarCliente() throws Exception {
+        void deveGerarExcecaoSeNaoEncontrarEntregador() throws Exception {
             // Arrange
             String invalidId = "999";
             when(deliveryManGateway.findDeliveryMan(invalidId)).thenReturn(null);
@@ -109,14 +109,14 @@ class DeliveryManControllerTest {
 
             // Assert
             assertEquals(HttpStatus.NOT_FOUND, response.getStatusCode());
-            assertEquals("Cliente não encontrado.", response.getBody());
+            assertEquals("Entregador não encontrado.", response.getBody());
         }
     }
 
     @Nested
     class UpdateDeliveryMan {
         @Test
-        void devePermitirAtualizarCliente() throws Exception {
+        void devePermitirAtualizarEntregador() throws Exception {
             // Arrange
             UUID DeliveryManId = UUID.randomUUID();
             DeliveryManDTO DeliveryManDTO = new DeliveryManDTO();
@@ -136,12 +136,12 @@ class DeliveryManControllerTest {
         }
 
         @Test
-        void deveGerarExcecaoQuandoAtualizarClienteNomeNulo() throws Exception {
+        void deveGerarExcecaoQuandoAtualizarEntregadorNomeNulo() throws Exception {
 
         }
 
         @Test
-        void deveGerarExcecaoQuandoAtualizarClienteNãoEncontrado() throws Exception {
+        void deveGerarExcecaoQuandoAtualizarEntregadorNãoEncontrado() throws Exception {
             // Arrange
             String invalidId = "999";
             DeliveryManDTO DeliveryManDTO = new DeliveryManDTO();
@@ -157,7 +157,7 @@ class DeliveryManControllerTest {
     @Nested
     class DeleteDeliveryMan {
         @Test
-        void devePermitirApagarCliente() throws Exception {
+        void devePermitirApagarEntregador() throws Exception {
             // Arrange
             String DeliveryManId = UUID.randomUUID().toString();
             DeliveryMan DeliveryMan = new DeliveryMan();
@@ -169,11 +169,11 @@ class DeliveryManControllerTest {
 
             // Assert
             assertEquals(HttpStatus.OK, response.getStatusCode());
-            assertEquals("Cliente removido.", response.getBody());
+            assertEquals("Entregador removido.", response.getBody());
         }
 
         @Test
-        void deveGerarExcecaoQuandoDeletarClienteNãoEncontrado() throws Exception {
+        void deveGerarExcecaoQuandoDeletarEntregadorNãoEncontrado() throws Exception {
             // Arrange
             String DeliveryManId = UUID.randomUUID().toString();
             // Mock the behavior of DeliveryManGateway
@@ -184,7 +184,7 @@ class DeliveryManControllerTest {
 
             // Assert
             assertEquals(HttpStatus.NOT_FOUND, response.getStatusCode());
-            assertEquals("Cliente não encontrado.", response.getBody());
+            assertEquals("Entregador não encontrado.", response.getBody());
         }
     }
 }

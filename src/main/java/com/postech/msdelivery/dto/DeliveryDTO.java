@@ -6,6 +6,7 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+
 @Data
 @NoArgsConstructor
 public class DeliveryDTO {
@@ -18,9 +19,10 @@ public class DeliveryDTO {
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     private String expectedDeliveryEndDate;
     private int status;
-    public DeliveryDTO(String idOrder) {
+
+    public DeliveryDTO(String idOrder, String idDeliveryMan) {
         this.idOrder = idOrder;
-        this.idDeliveryMan = null;
+        this.idDeliveryMan = idDeliveryMan;
         this.deliveryStartDate = "2000-01-01 00:00:00";
         this.expectedDeliveryEndDate = "2000-01-01 00:00:00";
         this.status = 0;

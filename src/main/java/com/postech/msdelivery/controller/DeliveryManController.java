@@ -42,7 +42,7 @@ public class DeliveryManController {
         }
     }
 
-    @GetMapping("/")
+    @GetMapping("")
     @Operation(summary = "Request for list all DeliveryMans", responses = {
             @ApiResponse(description = "DeliveryMan's list", responseCode = "200"),
     })

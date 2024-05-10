@@ -1,27 +1,23 @@
 package com.postech.msdelivery.usecase;
 
+import com.postech.msdelivery.dto.DeliveryDTO;
 import com.postech.msdelivery.entity.Delivery;
 import org.junit.jupiter.api.Test;
 import org.springframework.web.client.HttpClientErrorException;
 
-import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
-import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.*;
 
 public class DeliveryUseCaseTest {
     @Test
-    void testValidarInsertDelivery_ValidInput() {
-//        // Arrange
-//        Delivery delivery = new Delivery();
-//        when(DeliveryUseCase.validateInsertDelivery(delivery).thenReturn(delivery);
-//
-//        // Act & Assert
-//        assertDoesNotThrow(() -> DeliveryUseCase.validateInsertDelivery(delivery));
+    void testValidateInsertDelivery_Valido() {
+        DeliveryDTO deliveryDTO = new DeliveryDTO("b1fcbe89-fc7d-4e34-98c1-093e511cfa13","4fa3cbe9-1575-448b-89d1-e2d2667c818b");
+        Delivery delivery = new Delivery(deliveryDTO);
+        assertEquals(DeliveryUseCase.validateInsertDelivery(delivery),true);
     }
-
     @Test
-    void testValidateInsertDelivery_ClientNotFound_ThrowsException() {
+    void testValidateInsertDelivery_Invalido() {
         Delivery delivery = new Delivery();
-        assertThrows(HttpClientErrorException.class, () -> DeliveryUseCase.validateInsertDelivery(delivery));
+        assertEquals(DeliveryUseCase.validateInsertDelivery(delivery),false);
     }
 
 }

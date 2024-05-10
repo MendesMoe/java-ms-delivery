@@ -2,7 +2,9 @@ package com.postech.msdelivery.controller;
 
 import com.postech.msdelivery.dto.DeliveryDTO;
 import com.postech.msdelivery.entity.Delivery;
+import com.postech.msdelivery.entity.DeliveryMan;
 import com.postech.msdelivery.gateway.DeliveryGateway;
+import com.postech.msdelivery.gateway.DeliveryManGateway;
 import com.postech.msdelivery.usecase.DeliveryUseCase;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
@@ -17,6 +19,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.client.HttpClientErrorException;
 
 import java.util.List;
+import java.util.UUID;
 
 @Slf4j
 @RestController
@@ -25,6 +28,7 @@ import java.util.List;
 public class DeliveryController {
 
     private final DeliveryGateway deliveryGateway;
+    private final DeliveryManGateway deliveryManGateway;
 
     @PostMapping("")
     @Operation(summary = "Request for create a Delivery", responses = {
@@ -35,9 +39,13 @@ public class DeliveryController {
         log.info("PostMapping - createDelivery for customer [{}]", deliveryDTO.getIdOrder());
         try {
             Delivery deliveryNew = new Delivery(deliveryDTO);
-            DeliveryUseCase.validateInsertDelivery(deliveryNew);
-            Delivery deliveryCreated = deliveryGateway.createDelivery(deliveryNew);
-            return new ResponseEntity<>(deliveryCreated, HttpStatus.CREATED);
+            UUID idCustomer = deliveryGateway.getCustomerIdFromOrder(deliveryNew.getIdOrder());
+            if (idCustomer != null && DeliveryUseCase.validateInsertDelivery(deliveryNew)) {
+                Delivery deliveryCreated = deliveryGateway.createDelivery(deliveryNew);
+                return new ResponseEntity<>(deliveryCreated, HttpStatus.CREATED);
+            } else {
+                return new ResponseEntity<>("Não foi possivel criar a entrega.", HttpStatus.BAD_REQUEST);
+            }
         } catch (HttpClientErrorException enf) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(enf.getMessage());
         } catch (Exception e) {
@@ -68,9 +76,16 @@ public class DeliveryController {
             delivery.setExpectedDeliveryEndDate(deliveryNew.getExpectedDeliveryEndDate() != null ?
                     deliveryNew.getExpectedDeliveryEndDate() : delivery.getExpectedDeliveryEndDate());
 
-            DeliveryUseCase.validateInsertDelivery(delivery);
-            Delivery deliveryCreated = deliveryGateway.createDelivery(delivery);
-            return new ResponseEntity<>(deliveryCreated, HttpStatus.CREATED);
+            DeliveryMan DeliveryMan = deliveryManGateway.findDeliveryMan(String.valueOf(deliveryNew.getIdDeliveryMan()));
+            deliveryNew.setIdDeliveryMan(DeliveryMan == null ? null : DeliveryMan.getId());
+
+            UUID idCustomer = deliveryGateway.getCustomerIdFromOrder(deliveryNew.getIdOrder());
+            if (idCustomer != null && DeliveryUseCase.validateInsertDelivery(delivery)) {
+                Delivery deliveryCreated = deliveryGateway.createDelivery(delivery);
+                return new ResponseEntity<>(deliveryCreated, HttpStatus.CREATED);
+            } else {
+                return new ResponseEntity<>("Não foi possivel atualizar a entrega.", HttpStatus.BAD_REQUEST);
+            }
         } catch (HttpClientErrorException enf) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(enf.getMessage());
         } catch (Exception e) {
@@ -107,7 +122,7 @@ public class DeliveryController {
     @Operation(summary = "Request for list all delivery by best route", responses = {
             @ApiResponse(description = "Delivery's list", responseCode = "200"),
     })
-    public ResponseEntity<List<Delivery>> listAllDeliverysBestRoute(@PathVariable String idDeliveryMan ) {
+    public ResponseEntity<List<Delivery>> listAllDeliverysBestRoute(@PathVariable String idDeliveryMan) {
         log.info("Get Best Route");
         List<Delivery> delivery = deliveryGateway.findDeliverysByIdDeliveryMan(idDeliveryMan);
         return new ResponseEntity<>(delivery, HttpStatus.OK);
