@@ -13,6 +13,7 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.jetbrains.annotations.NotNull;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -34,18 +35,11 @@ public class DeliveryController {
     @Operation(summary = "Request for create a Delivery", responses = {
             @ApiResponse(description = "The Delivery was updated", responseCode = "200")
     })
-
     public ResponseEntity<?> createDelivery(@Valid @RequestBody DeliveryDTO deliveryDTO) {
-        log.info("PostMapping - createDelivery for customer [{}]", deliveryDTO.getIdOrder());
+        log.info("PostMapping - createDelivery [{}]", deliveryDTO.getIdOrder());
         try {
             Delivery deliveryNew = new Delivery(deliveryDTO);
-            UUID idCustomer = deliveryGateway.getCustomerIdFromOrder(deliveryNew.getIdOrder());
-            if (idCustomer != null && DeliveryUseCase.validateInsertDelivery(deliveryNew)) {
-                Delivery deliveryCreated = deliveryGateway.createDelivery(deliveryNew);
-                return new ResponseEntity<>(deliveryCreated, HttpStatus.CREATED);
-            } else {
-                return new ResponseEntity<>("Não foi possivel criar a entrega.", HttpStatus.BAD_REQUEST);
-            }
+            return saveNewDelivery(deliveryNew);
         } catch (HttpClientErrorException enf) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(enf.getMessage());
         } catch (Exception e) {
@@ -59,37 +53,47 @@ public class DeliveryController {
     })
     public ResponseEntity<?> updateDelivery(@RequestBody @Valid DeliveryDTO deliveryDTO) {
         log.info("update Delivery [{}]", deliveryDTO.getId());
-
         try {
-            Delivery delivery = deliveryGateway.findDelivery(deliveryDTO.getId());
-            Delivery deliveryNew = new Delivery(deliveryDTO);
+            Delivery deliveryToSave = deliveryGateway.findDelivery(deliveryDTO.getId());
+            Delivery deliveryRequest = new Delivery(deliveryDTO);
 
-            delivery.setIdDeliveryMan(deliveryNew.getIdDeliveryMan() != null ?
-                    deliveryNew.getIdDeliveryMan() : delivery.getIdDeliveryMan());
+            deliveryToSave.setIdDeliveryMan(deliveryRequest.getIdDeliveryMan() != null ?
+                    deliveryRequest.getIdDeliveryMan() : deliveryToSave.getIdDeliveryMan());
 
-            delivery.setStatus(deliveryNew.getStatus() != 0 ?
-                    deliveryNew.getStatus() : delivery.getStatus());
+            deliveryToSave.setStatus(deliveryRequest.getStatus() != 0 ?
+                    deliveryRequest.getStatus() : deliveryToSave.getStatus());
 
-            delivery.setDeliveryStartDate(deliveryNew.getDeliveryStartDate() != null ?
-                    deliveryNew.getDeliveryStartDate() : delivery.getDeliveryStartDate());
+            deliveryToSave.setDeliveryStartDate(deliveryRequest.getDeliveryStartDate() != null ?
+                    deliveryRequest.getDeliveryStartDate() : deliveryToSave.getDeliveryStartDate());
 
-            delivery.setExpectedDeliveryEndDate(deliveryNew.getExpectedDeliveryEndDate() != null ?
-                    deliveryNew.getExpectedDeliveryEndDate() : delivery.getExpectedDeliveryEndDate());
-
-            DeliveryMan DeliveryMan = deliveryManGateway.findDeliveryMan(String.valueOf(deliveryNew.getIdDeliveryMan()));
-            deliveryNew.setIdDeliveryMan(DeliveryMan == null ? null : DeliveryMan.getId());
-
-            UUID idCustomer = deliveryGateway.getCustomerIdFromOrder(deliveryNew.getIdOrder());
-            if (idCustomer != null && DeliveryUseCase.validateInsertDelivery(delivery)) {
-                Delivery deliveryCreated = deliveryGateway.createDelivery(delivery);
-                return new ResponseEntity<>(deliveryCreated, HttpStatus.CREATED);
-            } else {
-                return new ResponseEntity<>("Não foi possivel atualizar a entrega.", HttpStatus.BAD_REQUEST);
-            }
+            deliveryToSave.setExpectedDeliveryEndDate(deliveryRequest.getExpectedDeliveryEndDate() != null ?
+                    deliveryRequest.getExpectedDeliveryEndDate() : deliveryToSave.getExpectedDeliveryEndDate());
+            
+            return saveNewDelivery(deliveryToSave);
         } catch (HttpClientErrorException enf) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(enf.getMessage());
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
+        }
+    }
+
+    @NotNull
+    private ResponseEntity<?> saveNewDelivery(Delivery deliveryToSave) {
+        DeliveryMan DeliveryMan = deliveryManGateway.findDeliveryMan(deliveryToSave.getIdDeliveryMan().toString());
+        deliveryToSave.setIdDeliveryMan(DeliveryMan == null ? null : deliveryToSave.getIdDeliveryMan());
+
+        UUID idCustomer = deliveryGateway.getCustomerIdFromOrder(deliveryToSave.getIdOrder());
+        deliveryToSave.setIdOrder(idCustomer == null ? null : deliveryToSave.getIdOrder());
+
+        if (DeliveryUseCase.validateSaveDelivery(deliveryToSave)) {
+            Delivery deliveryCreated = deliveryGateway.createDelivery(deliveryToSave);
+            return new ResponseEntity<>(deliveryCreated, HttpStatus.CREATED);
+        } else {
+            return new ResponseEntity<>("Não foi possivel criar a entrega"
+                    + (deliveryToSave.getIdOrder() == null ? " [Pedido ou Cliente inválido]":"")
+                    + (deliveryToSave.getIdDeliveryMan() == null ? " [Entregador inválido]":"")
+                    + "."
+                    , HttpStatus.BAD_REQUEST);
         }
     }
 
@@ -116,7 +120,6 @@ public class DeliveryController {
         }
         return new ResponseEntity<>("Entrega não encontrado.", HttpStatus.NOT_FOUND);
     }
-
 
     @GetMapping("/best_route/{idDeliveryMan}")
     @Operation(summary = "Request for list all delivery by best route", responses = {

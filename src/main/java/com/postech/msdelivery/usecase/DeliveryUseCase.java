@@ -10,7 +10,9 @@ import org.springframework.stereotype.Service;
 @Component
 @Service
 public class DeliveryUseCase {
-    public static boolean validateInsertDelivery(Delivery deliveryNew) {
-        return (deliveryNew != null && deliveryNew.getIdOrder() != null && deliveryNew.getIdDeliveryMan() != null);
+    public static boolean validateSaveDelivery(Delivery deliveryNew) {
+        return (deliveryNew != null
+                && deliveryNew.getIdOrder() != null
+                && deliveryNew.getIdDeliveryMan() != null);
     }
 }

@@ -42,6 +42,11 @@ class DeliveryControllerTest {
         void devePermitirRegistrarEntrega() throws Exception {
             DeliveryDTO deliveryDTO = new DeliveryDTO("b1fcbe89-fc7d-4e34-98c1-093e511cfa13", "4fa3cbe9-1575-448b-89d1-e2d2667c818b");
             Delivery delivery = new Delivery(deliveryDTO);
+
+            DeliveryMan deliveryMan = new DeliveryMan();
+            deliveryMan.setName("John Doe");
+            when(deliveryManGateway.findDeliveryMan(any()) ).thenReturn(deliveryMan);
+
             when(deliveryGateway.findDelivery(any())).thenReturn(delivery);
             when(deliveryGateway.getCustomerIdFromOrder(any())).thenReturn(UUID.fromString("d295ee33-99c1-4214-9eaf-77e79cdc3e23"));
             when(deliveryGateway.updateDelivery(any())).thenReturn(delivery);
