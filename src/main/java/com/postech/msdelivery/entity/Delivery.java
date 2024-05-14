@@ -1,14 +1,17 @@
 package com.postech.msdelivery.entity;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.postech.msdelivery.dto.DeliveryDTO;
-import com.postech.msdelivery.usecase.DeliveryUseCase;
+import com.postech.msdelivery.gateway.DeliveryGateway;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.springframework.http.ResponseEntity;
 
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+import java.util.Map;
 import java.util.UUID;
 
 @Data
@@ -31,21 +34,23 @@ public class Delivery {
     private LocalDateTime expectedDeliveryEndDate;
 
     public String getStatusDescription() {
-        switch (this.status) {
-            case 0:
-                return "Aguardando Envio";
-            case 1:
-                return "Em rota de envio";
-            case 2:
-                return "A caminho";
-            case 3:
-                return "Entregue";
-            case 4:
-                return "Entrega Rejeitada";
-            case 5:
-                return "Entrega Cancelada";
+        return switch (this.status) {
+            case 0 -> "Aguardando Envio";
+            case 1 -> "Em rota de envio";
+            case 2 -> "A caminho";
+            case 3 -> "Entregue";
+            case 4 -> "Entrega Rejeitada";
+            case 5 -> "Entrega Cancelada";
+            default -> "Status Inválido";
+        };
+    }
+
+    public String getCepCustomer() {
+        try {
+            return DeliveryGateway.getCepCustomer(DeliveryGateway.getCustomerIdFromOrder(idOrder));
+        } catch (Exception e) {
+            return "";
         }
-        return statusDescription;
     }
 
     public Delivery(DeliveryDTO deliveryDTO) {

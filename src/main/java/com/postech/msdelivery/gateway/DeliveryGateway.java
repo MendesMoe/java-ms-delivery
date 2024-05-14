@@ -4,7 +4,6 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.postech.msdelivery.entity.Delivery;
 import com.postech.msdelivery.interfaces.IDeliveryGateway;
 import com.postech.msdelivery.repository.DeliveryRepository;
-import com.postech.msdelivery.usecase.DeliveryUseCase;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestTemplate;
@@ -54,45 +53,37 @@ public class DeliveryGateway implements IDeliveryGateway {
     @Override
     public List<Delivery> listAllDeliverys() {
         List<Delivery> deliveryList = deliveryRepository.findAll();
-        deliveryList = updateCep(deliveryList);
         return deliveryList;
     }
 
-    public List<Delivery> findDeliverysByIdDeliveryMan(String idDeliveryMan){
+    public List<Delivery> findDeliverysByIdDeliveryMan(String idDeliveryMan) {
         List<Delivery> deliveryList = deliveryRepository.findDeliverysByIdDeliveryMan(UUID.fromString(idDeliveryMan));
-        deliveryList = updateCep(deliveryList);
-        Collections.sort(deliveryList,Comparator.comparing(Delivery::getCepCustomer));
+        Collections.sort(deliveryList, Comparator.comparing(Delivery::getCepCustomer));
         return deliveryList;
     }
 
-    public List<Delivery> updateCep(List<Delivery> deliveryList){
-        for (Delivery delivery : deliveryList) {
-            String cep = getCepCustomer(delivery.getIdOrder());
-            delivery.setCepCustomer(cep);
-        }
-        return deliveryList;
+    public static UUID getCustomerIdFromOrder(UUID idOrder) {
+        String url = "http://localhost:8082/orders/" + idOrder;
+        return UUID.fromString(FieldFromMap(url, "idCustomer"));
     }
 
-    public UUID getCustomerIdFromOrder(UUID idOrder) {
+    public UUID getCustomerId(UUID idOrder) {
+        String url = "http://localhost:8082/orders/" + idOrder;
+        return UUID.fromString(FieldFromMap(url, "cep"));
+    }
+
+    public static String getCepCustomer(UUID idCustomer) {
+        String url = "http://localhost:8081/customers/" + idCustomer;
+        return FieldFromMap(url, "cep");
+    }
+
+    private static String FieldFromMap(String url, String field) {
         try {
-            String url = "http://localhost:8082/orders/" + idOrder;
             ResponseEntity<String> response = restTemplate.getForEntity(url, String.class);
 
             ObjectMapper mapper = new ObjectMapper();
             Map<String, Object> map = mapper.readValue(response.getBody(), Map.class);
-            return UUID.fromString(map.get("idCustomer").toString());
-        } catch (Exception e) {
-            return null;
-        }
-    }
-    public String getCepCustomer(UUID idCustomer) {
-        try {
-            String url = "http://localhost:8081/customers/" + idCustomer;
-            ResponseEntity<String> response = restTemplate.getForEntity(url, String.class);
-
-            ObjectMapper mapper = new ObjectMapper();
-            Map<String, Object> map = mapper.readValue(response.getBody(), Map.class);
-            return map.get("cep").toString();
+            return map.get(field).toString();
         } catch (Exception e) {
             return "";
         }

@@ -48,7 +48,7 @@ class DeliveryControllerTest {
             when(deliveryManGateway.findDeliveryMan(any()) ).thenReturn(deliveryMan);
 
             when(deliveryGateway.findDelivery(any())).thenReturn(delivery);
-            when(deliveryGateway.getCustomerIdFromOrder(any())).thenReturn(UUID.fromString("d295ee33-99c1-4214-9eaf-77e79cdc3e23"));
+            when(deliveryGateway.getCustomerId(any())).thenReturn(UUID.fromString("d295ee33-99c1-4214-9eaf-77e79cdc3e23"));
             when(deliveryGateway.updateDelivery(any())).thenReturn(delivery);
             ResponseEntity<?> response = deliveryController.createDelivery(deliveryDTO);
             assertEquals(HttpStatus.CREATED, response.getStatusCode());
@@ -62,7 +62,7 @@ class DeliveryControllerTest {
             deliveryMan.setId(delivery.getIdDeliveryMan());
 
             when(deliveryGateway.findDelivery(any())).thenReturn(delivery);
-            when(deliveryGateway.getCustomerIdFromOrder(any())).thenReturn(UUID.fromString("d295ee33-99c1-4214-9eaf-77e79cdc3e23"));
+            when(deliveryGateway.getCustomerId(any())).thenReturn(UUID.fromString("d295ee33-99c1-4214-9eaf-77e79cdc3e23"));
             when(deliveryManGateway.findDeliveryMan(any())).thenReturn(deliveryMan);
             when(deliveryGateway.updateDelivery(any())).thenReturn(delivery);
             ResponseEntity<?> response = deliveryController.updateDelivery(deliveryDTO);
@@ -106,6 +106,18 @@ class DeliveryControllerTest {
 
             when(deliveryGateway.listAllDeliverys()).thenReturn(delivery);
             ResponseEntity<List<Delivery>> response = deliveryController.listAllDeliverys();
+            assertEquals(HttpStatus.OK, response.getStatusCode());
+            assertEquals(delivery, response.getBody());
+        }
+
+        @Test
+        void devePermitirListarTodosEntregasPorEntregador() throws Exception {
+            String deliveryId = "123";
+            List<Delivery> delivery = new ArrayList<>();
+            delivery.add(new Delivery());
+            delivery.add(new Delivery());
+            when(deliveryGateway.findDeliverysByIdDeliveryMan(deliveryId)).thenReturn(delivery);
+            ResponseEntity<List<Delivery>> response = deliveryController.listAllDeliverysBestRoute(deliveryId);
             assertEquals(HttpStatus.OK, response.getStatusCode());
             assertEquals(delivery, response.getBody());
         }

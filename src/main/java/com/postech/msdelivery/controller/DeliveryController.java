@@ -68,7 +68,7 @@ public class DeliveryController {
 
             deliveryToSave.setExpectedDeliveryEndDate(deliveryRequest.getExpectedDeliveryEndDate() != null ?
                     deliveryRequest.getExpectedDeliveryEndDate() : deliveryToSave.getExpectedDeliveryEndDate());
-            
+
             return saveNewDelivery(deliveryToSave);
         } catch (HttpClientErrorException enf) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(enf.getMessage());
@@ -82,7 +82,7 @@ public class DeliveryController {
         DeliveryMan DeliveryMan = deliveryManGateway.findDeliveryMan(deliveryToSave.getIdDeliveryMan().toString());
         deliveryToSave.setIdDeliveryMan(DeliveryMan == null ? null : deliveryToSave.getIdDeliveryMan());
 
-        UUID idCustomer = deliveryGateway.getCustomerIdFromOrder(deliveryToSave.getIdOrder());
+        UUID idCustomer = deliveryGateway.getCustomerId(deliveryToSave.getIdOrder());
         deliveryToSave.setIdOrder(idCustomer == null ? null : deliveryToSave.getIdOrder());
 
         if (DeliveryUseCase.validateSaveDelivery(deliveryToSave)) {
@@ -90,8 +90,8 @@ public class DeliveryController {
             return new ResponseEntity<>(deliveryCreated, HttpStatus.CREATED);
         } else {
             return new ResponseEntity<>("Não foi possivel criar a entrega"
-                    + (deliveryToSave.getIdOrder() == null ? " [Pedido ou Cliente inválido]":"")
-                    + (deliveryToSave.getIdDeliveryMan() == null ? " [Entregador inválido]":"")
+                    + (deliveryToSave.getIdOrder() == null ? " [Pedido ou Cliente inválido]" : "")
+                    + (deliveryToSave.getIdDeliveryMan() == null ? " [Entregador inválido]" : "")
                     + "."
                     , HttpStatus.BAD_REQUEST);
         }
