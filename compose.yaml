@@ -1,7 +1,9 @@
 services:
-  mysql:
+  mysql-delivery:
     image: mysql:latest
     restart: always
+    container_name: mysql-delivery
+    hostname: "mysql-delivery"
     environment:
       MYSQL_DATABASE: 'deliverydb'
       MYSQL_USER: 'deliveryuser'
@@ -9,3 +11,24 @@ services:
       MYSQL_ROOT_PASSWORD: '54321'
     ports:
       - '3308:3306'
+    networks:
+      - my_network
+
+
+  msdelivery:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    depends_on:
+      - mysql-delivery
+    environment:
+      MYSQL_HOSTNAME: mysql-delivery
+      MYSQL_PORT: 3306
+    ports:
+      - 8083:8083
+    networks:
+      - my_network
+
+networks:
+  my_network:
+    driver: bridge
