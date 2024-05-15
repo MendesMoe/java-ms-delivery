@@ -32,7 +32,7 @@ public class DeliveryController {
     })
 
     public ResponseEntity<?> createDelivery(@Valid @RequestBody DeliveryDTO deliveryDTO) {
-        log.info("PostMapping - createDelivery for customer [{}]", deliveryDTO.getIdOrder());
+        log.info("PostMapping - createDelivery for customer [{}]", deliveryDTO.getOrderId());
         try {
             Delivery deliveryNew = new Delivery(deliveryDTO);
             DeliveryUseCase.validateInsertDelivery(deliveryNew);
@@ -53,10 +53,10 @@ public class DeliveryController {
         log.info("update Delivery [{}]", deliveryDTO.getId());
 
         try {
-            Delivery delivery = deliveryGateway.findDelivery(deliveryDTO.getId());
+            Delivery delivery = deliveryGateway.findDelivery(Long.valueOf(deliveryDTO.getId()));
             Delivery deliveryNew = new Delivery(deliveryDTO);
 
-            delivery.setDeliveryManName(deliveryNew.getDeliveryManName() != null ?
+           /* delivery.setDeliveryManName(deliveryNew.getDeliveryManName() != null ?
                     deliveryNew.getDeliveryManName() : delivery.getDeliveryManName());
 
             delivery.setStatus(deliveryNew.getStatus() != 0 ?
@@ -66,7 +66,7 @@ public class DeliveryController {
                     deliveryNew.getDeliveryStartDate() : delivery.getDeliveryStartDate());
 
             delivery.setExpectedDeliveryEndDate(deliveryNew.getExpectedDeliveryEndDate() != null ?
-                    deliveryNew.getExpectedDeliveryEndDate() : delivery.getExpectedDeliveryEndDate());
+                    deliveryNew.getExpectedDeliveryEndDate() : delivery.getExpectedDeliveryEndDate());*/
 
             DeliveryUseCase.validateInsertDelivery(delivery);
             Delivery deliveryCreated = deliveryGateway.createDelivery(delivery);
@@ -94,7 +94,7 @@ public class DeliveryController {
             @ApiResponse(description = "The delivery by ID", responseCode = "200", content = @Content(schema = @Schema(implementation = Delivery.class))),
             @ApiResponse(description = "Delivery Not Found", responseCode = "404", content = @Content(schema = @Schema(type = "string", example = "Entrega não encontrado.")))
     })
-    public ResponseEntity<?> findDelivery(@PathVariable String id) {
+    public ResponseEntity<?> findDelivery(@PathVariable Long id) {
         log.info("GetMapping - FindDelivery");
         Delivery delivery = deliveryGateway.findDelivery(id);
         if (delivery != null) {

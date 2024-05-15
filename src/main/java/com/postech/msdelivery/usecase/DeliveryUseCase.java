@@ -17,7 +17,7 @@ public class DeliveryUseCase {
     static RestTemplate restTemplate = new RestTemplate();
 
     public static void validateInsertDelivery(Delivery deliveryNew) {
-        findOrder(String.valueOf(deliveryNew.getIdOrder()));
+        findOrder(String.valueOf(deliveryNew.getOrderId()));
     }
 
     public static boolean findOrder(String idOrder) {

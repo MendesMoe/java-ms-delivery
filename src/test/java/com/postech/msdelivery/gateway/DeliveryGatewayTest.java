@@ -59,12 +59,12 @@ public class DeliveryGatewayTest {
     @Test
     void testDeleteDelivery_ValidInput_ReturnsTrue() {
         // Arrange
-        UUID deliveryId = UUID.randomUUID();
+        Long deliveryId = 345l;
         // Mock the behavior of deliveryRepository
         doNothing().when(deliveryRepository).deleteById(deliveryId);
 
         // Act
-        boolean result = deliveryGateway.deleteDelivery(String.valueOf(deliveryId));
+        boolean result = deliveryGateway.deleteDelivery(deliveryId);
 
         // Assert
         assertTrue(result);
@@ -73,7 +73,7 @@ public class DeliveryGatewayTest {
     @Test
     void testDeleteDelivery_InvalidInput_ReturnsFalse() {
         // Arrange
-        String invalidDeliveryId = "invalid-id";
+        Long invalidDeliveryId = 123l;
 
         // Act
         boolean result = deliveryGateway.deleteDelivery(invalidDeliveryId);
@@ -85,13 +85,13 @@ public class DeliveryGatewayTest {
     @Test
     void testFindDelivery_ValidInput_ReturnsDelivery() {
         // Arrange
-        UUID deliveryId = UUID.randomUUID();
+        Long deliveryId = 345l;
         Delivery expectedDelivery = new Delivery();
         // Mock the behavior of deliveryRepository
         when(deliveryRepository.findById(deliveryId)).thenReturn(Optional.of(expectedDelivery));
 
         // Act
-        Delivery result = deliveryGateway.findDelivery(String.valueOf(deliveryId));
+        Delivery result = deliveryGateway.findDelivery(deliveryId);
 
         // Assert
         assertEquals(expectedDelivery, result);
@@ -100,8 +100,7 @@ public class DeliveryGatewayTest {
     @Test
     void testFindDelivery_InvalidInput_ReturnsNull() {
         // Arrange
-        String invalidDeliveryId = "invalid-id";
-
+        Long invalidDeliveryId = 5l;
         // Act
         Delivery result = deliveryGateway.findDelivery(invalidDeliveryId);
 

@@ -1,6 +1,7 @@
 package com.postech.msdelivery.gateway;
 
 import com.postech.msdelivery.entity.Delivery;
+import com.postech.msdelivery.exception.DeliveryNotFoundException;
 import com.postech.msdelivery.interfaces.IDeliveryGateway;
 import com.postech.msdelivery.repository.DeliveryRepository;
 import org.springframework.stereotype.Component;
@@ -27,10 +28,9 @@ public class DeliveryGateway implements IDeliveryGateway {
     }
 
     @Override
-    public boolean deleteDelivery(String strId) {
+    public boolean deleteDelivery(Long id) {
         try {
-            UUID uuid = UUID.fromString(strId);
-            deliveryRepository.deleteById(uuid);
+            deliveryRepository.deleteById(id);
         } catch (Exception e) {
             return false;
         }
@@ -38,13 +38,8 @@ public class DeliveryGateway implements IDeliveryGateway {
     }
 
     @Override
-    public Delivery findDelivery(String strId) {
-        try {
-            UUID uuid = UUID.fromString(strId);
-            return deliveryRepository.findById(uuid).orElseThrow();
-        } catch (Exception e) {
-            return null;
-        }
+    public Delivery findDelivery(Long deliveryId) {
+        return deliveryRepository.findById(deliveryId).orElseThrow(() -> new DeliveryNotFoundException(deliveryId));
     }
 
     @Override

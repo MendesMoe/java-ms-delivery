@@ -9,9 +9,9 @@ public interface IDeliveryGateway {
 
     public Delivery updateDelivery(Delivery delivery);
 
-    public boolean deleteDelivery(String strId);
+    public boolean deleteDelivery(Long id);
 
-    public Delivery findDelivery(String strId);
+    public Delivery findDelivery(Long id);
 
     public List<Delivery> listAllDeliverys();
 }

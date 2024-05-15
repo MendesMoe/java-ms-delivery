@@ -6,52 +6,71 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
-import java.util.UUID;
 
 @Data
 @Entity
-@Table(name = "tb_Delivery")
+@Table(name = "tb_delivery")
 @NoArgsConstructor
 @AllArgsConstructor
 public class Delivery {
     @Id
-    @GeneratedValue(strategy = GenerationType.UUID)
-    private UUID id;
-    private UUID idOrder;
-    private String deliveryManName;
-    private int status;
-    @Transient
-    private String statusDescription;
-    private LocalDateTime deliveryStartDate;
-    private LocalDateTime expectedDeliveryEndDate;
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
+
+    @Column(name = "order_id")
+    private Long orderId;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "delivery_person_id")
+    private DeliveryPerson deliveryPerson;
+
+    @Column(nullable = false)
+    @Enumerated(EnumType.STRING)
+    private DeliveryStatus status;
+
+    @Column(nullable = false)
+    private LocalDateTime startDate;
+
+    @Column(nullable = false)
+    private LocalDateTime expectedEndDate;
+
+    @Column(nullable = false)
+    private BigDecimal currentLatitude;
+
+    @Column(nullable = false)
+    private BigDecimal currentLongitude;
+
+    //@OneToMany(mappedBy = "delivery")
+    //private List<DeliveryTracking> tracking;
 
     public String getStatusDescription() {
         switch (this.status) {
-            case 0:
+            case PLACED:
                 return "Aguardando Envio";
-            case 1:
+            case IN_PROGRESS:
                 return "Em rota de envio";
-            case 2:
+            case OUT_FOR_DELIVERY:
                 return "A caminho";
-            case 3:
+            case DELIVERED:
                 return "Entregue";
-            case 4:
+            case FAILED:
                 return "Entrega Rejeitada";
-            case 5:
+            case CANCELED:
                 return "Entrega Cancelada";
         }
-        return statusDescription;
+        return null;
     }
 
     public Delivery(DeliveryDTO deliveryDTO) {
-        this.id = UUID.randomUUID();
-        this.idOrder = UUID.fromString(deliveryDTO.getIdOrder());
-        this.deliveryManName = deliveryDTO.getDeliveryManName();
-        this.status = deliveryDTO.getStatus();
+        this.orderId = deliveryDTO.getOrderId();
+        //this.deliveryPerson = deliveryDTO.getDeliveryPersonDTO();
+        this.deliveryPerson = null;
+        this.status = DeliveryStatus.valueOf(deliveryDTO.getStatus());
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
-        this.deliveryStartDate = LocalDateTime.parse(deliveryDTO.getDeliveryStartDate(), formatter);
-        this.expectedDeliveryEndDate = LocalDateTime.parse(deliveryDTO.getExpectedDeliveryEndDate(), formatter);
+        this.startDate = LocalDateTime.parse(deliveryDTO.getDeliveryStartDate(), formatter);
+        this.expectedEndDate = LocalDateTime.parse(deliveryDTO.getExpectedDeliveryEndDate(), formatter);
     }
 }
