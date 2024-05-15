@@ -37,34 +37,48 @@ class DeliveryControllerTest {
     class CreatetDelivery {
         @Test
         void devePermitirRegistrarEntrega() throws Exception {
-            String idOrder = DeliveryUseCase.findOneOrder();
-            DeliveryDTO deliveryDTO = new DeliveryDTO(1l);
-            when(deliveryGateway.createDelivery(any())).thenReturn(new Delivery());
+            DeliveryDTO deliveryDTO = new DeliveryDTO("b1fcbe89-fc7d-4e34-98c1-093e511cfa13", "4fa3cbe9-1575-448b-89d1-e2d2667c818b");
+            Delivery delivery = new Delivery(deliveryDTO);
+
+            DeliveryMan deliveryMan = new DeliveryMan();
+            deliveryMan.setName("John Doe");
+            when(deliveryManGateway.findDeliveryMan(any()) ).thenReturn(deliveryMan);
+
+            when(deliveryGateway.findDelivery(any())).thenReturn(delivery);
+            when(deliveryGateway.getCustomerId(any())).thenReturn(UUID.fromString("d295ee33-99c1-4214-9eaf-77e79cdc3e23"));
+            when(deliveryGateway.updateDelivery(any())).thenReturn(delivery);
             ResponseEntity<?> response = deliveryController.createDelivery(deliveryDTO);
             assertEquals(HttpStatus.CREATED, response.getStatusCode());
         }
         @Test
         void devePermitirAtualizarEntrega() throws Exception {
-            String idOrder = DeliveryUseCase.findOneOrder();
-            DeliveryDTO deliveryDTO = new DeliveryDTO(1l);
-            when(deliveryGateway.updateDelivery(any())).thenReturn(new Delivery());
-            when(deliveryGateway.findDelivery(any())).thenReturn(new Delivery(deliveryDTO));
+            DeliveryDTO deliveryDTO = new DeliveryDTO("b1fcbe89-fc7d-4e34-98c1-093e511cfa13", "4fa3cbe9-1575-448b-89d1-e2d2667c818b");
+            Delivery delivery = new Delivery(deliveryDTO);
+            DeliveryMan deliveryMan = new DeliveryMan();
+            deliveryMan.setId(delivery.getIdDeliveryMan());
+
+            when(deliveryGateway.findDelivery(any())).thenReturn(delivery);
+            when(deliveryGateway.getCustomerId(any())).thenReturn(UUID.fromString("d295ee33-99c1-4214-9eaf-77e79cdc3e23"));
+            when(deliveryManGateway.findDeliveryMan(any())).thenReturn(deliveryMan);
+            when(deliveryGateway.updateDelivery(any())).thenReturn(delivery);
             ResponseEntity<?> response = deliveryController.updateDelivery(deliveryDTO);
             assertEquals(HttpStatus.CREATED, response.getStatusCode());
         }
+
         @Test
         void deveGerarExcecaoQuandoRegistrarEntregaNomeNulo() throws Exception {
             DeliveryDTO deliveryDTO = new DeliveryDTO();
             ResponseEntity<?> response = deliveryController.createDelivery(deliveryDTO);
             assertEquals(HttpStatus.BAD_REQUEST, response.getStatusCode());
         }
+
         @Test
         void deveGerarExcecaoQuandoRegistrarEntregaCOmpraInvalida() throws Exception {
             String idOrder = "a795dbef-c772-4df6-be7a-732d4167a7f0";
             DeliveryDTO deliveryDTO = new DeliveryDTO(1l);
             when(deliveryGateway.createDelivery(any())).thenReturn(new Delivery());
             ResponseEntity<?> response = deliveryController.createDelivery(deliveryDTO);
-            assertEquals(HttpStatus.NOT_FOUND, response.getStatusCode());
+            assertEquals(HttpStatus.BAD_REQUEST, response.getStatusCode());
         }
     }
 
@@ -90,6 +104,18 @@ class DeliveryControllerTest {
             ResponseEntity<List<Delivery>> response = deliveryController.listAllDeliverys();
             assertEquals(HttpStatus.OK, response.getStatusCode());
             assertEquals(delivery, response.getBody());*/
+        }
+
+        @Test
+        void devePermitirListarTodosEntregasPorEntregador() throws Exception {
+            String deliveryId = "123";
+            List<Delivery> delivery = new ArrayList<>();
+            delivery.add(new Delivery());
+            delivery.add(new Delivery());
+            when(deliveryGateway.findDeliverysByIdDeliveryMan(deliveryId)).thenReturn(delivery);
+            ResponseEntity<List<Delivery>> response = deliveryController.listAllDeliverysBestRoute(deliveryId);
+            assertEquals(HttpStatus.OK, response.getStatusCode());
+            assertEquals(delivery, response.getBody());
         }
 
         @Test

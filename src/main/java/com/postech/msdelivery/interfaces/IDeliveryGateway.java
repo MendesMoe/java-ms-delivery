@@ -14,4 +14,6 @@ public interface IDeliveryGateway {
     public Delivery findDelivery(Long id);
 
     public List<Delivery> listAllDeliverys();
+
+    public List<Delivery> findDeliverysByIdDeliveryMan(String idDeliveryMan);
 }
