@@ -19,6 +19,7 @@ services:
     build:
       context: .
       dockerfile: Dockerfile
+    hostname: "ms-delivery"
     depends_on:
       - mysql-delivery
     environment:
@@ -32,3 +33,4 @@ services:
 networks:
   my_network:
     driver: bridge
+    external: true
