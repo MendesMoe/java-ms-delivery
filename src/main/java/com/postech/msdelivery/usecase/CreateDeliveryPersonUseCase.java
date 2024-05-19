@@ -17,14 +17,13 @@ import org.springframework.stereotype.Component;
 public class CreateDeliveryPersonUseCase {
 
     private final DeliveryPersonRepository deliveryPersonRepository;
-    private final DeliveryPersonMapping deliveryPersonMapping;
 
 
     public DeliveryPersonResponse execute(DeliveryPersonDTO deliveryPersonDTO) {
         DeliveryPerson deliveryPerson = new DeliveryPerson(deliveryPersonDTO.getName(), deliveryPersonDTO.getEmail());
         deliveryPerson.setAvailable(true);
         DeliveryPerson savedDeliveryPerson = deliveryPersonRepository.save(deliveryPerson);
-        deliveryPersonDTO = deliveryPersonMapping.toDeliveryPersonDTO(savedDeliveryPerson);
+        deliveryPersonDTO = DeliveryPersonMapping.INSTANCE.toDeliveryPersonDTO(savedDeliveryPerson);
         return new DeliveryPersonResponse(deliveryPersonDTO);
     }
 
