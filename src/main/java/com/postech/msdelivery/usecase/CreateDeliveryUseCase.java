@@ -4,7 +4,7 @@ import com.postech.msdelivery.dto.DeliveryDTO;
 import com.postech.msdelivery.entity.Delivery;
 import com.postech.msdelivery.entity.DeliveryStatus;
 import com.postech.msdelivery.exception.DeliveryAlreadyExistsException;
-import com.postech.msdelivery.gateway.DeliveryGateway;
+import com.postech.msdelivery.service.DeliveryService;
 import com.postech.msdelivery.usecase.mapper.DeliveryMapping;
 import com.postech.msdelivery.usecase.response.DeliveryResponse;
 import org.springframework.stereotype.Component;
@@ -12,10 +12,10 @@ import org.springframework.stereotype.Component;
 @Component
 public class CreateDeliveryUseCase {
 
-    private final DeliveryGateway deliveryGateway;
+    private final DeliveryService deliveryService;
 
-    public CreateDeliveryUseCase(DeliveryGateway deliveryGateway) {
-        this.deliveryGateway = deliveryGateway;
+    public CreateDeliveryUseCase(DeliveryService deliveryService) {
+        this.deliveryService = deliveryService;
     }
 
     public DeliveryResponse execute(DeliveryDTO request) {
@@ -26,7 +26,7 @@ public class CreateDeliveryUseCase {
         delivery.setStatus(DeliveryStatus.PLACED);
 
         try {
-            deliveryGateway.createDelivery(delivery);
+            deliveryService.createDelivery(delivery);
 
             return new DeliveryResponse(DeliveryMapping.INSTANCE.toDeliveryDTO(delivery));
         } catch (DeliveryAlreadyExistsException e) {

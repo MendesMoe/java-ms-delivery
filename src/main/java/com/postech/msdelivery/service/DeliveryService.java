@@ -1,25 +1,56 @@
-package com.postech.msdelivery.gateway;
+package com.postech.msdelivery.service;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.postech.msdelivery.client.GoogleDirectionsClient;
+import com.postech.msdelivery.client.Order;
+import com.postech.msdelivery.client.OrderClient;
+import com.postech.msdelivery.client.Route;
 import com.postech.msdelivery.entity.Delivery;
+import com.postech.msdelivery.entity.DeliveryStatus;
 import com.postech.msdelivery.exception.DeliveryNotFoundException;
-import com.postech.msdelivery.interfaces.IDeliveryGateway;
+import com.postech.msdelivery.interfaces.IDeliveryService;
 import com.postech.msdelivery.repository.DeliveryRepository;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.ResponseEntity;
-import org.springframework.stereotype.Component;
+import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 
+import java.time.LocalDateTime;
 import java.util.*;
 
-@Component
-public class DeliveryGateway implements IDeliveryGateway {
+@Service
+public class DeliveryService implements IDeliveryService {
     private final DeliveryRepository deliveryRepository;
+    private final OrderClient orderClient;
+    private final GoogleDirectionsClient directionsClient;
+
+    @Value("${origin.address}")
+    private String ORIGIN_ADDRESS;
     static RestTemplate restTemplate = new RestTemplate();
 
-    public DeliveryGateway(DeliveryRepository deliveryRepository) {
+    public DeliveryService(DeliveryRepository deliveryRepository, OrderClient orderClient, GoogleDirectionsClient directionsClient) {
         this.deliveryRepository = deliveryRepository;
+        this.orderClient = orderClient;
+        this.directionsClient = directionsClient;
     }
 
+    @Override
+    public Delivery createDelivery(Long orderId) {
+        Order order = orderClient.getOrderById(orderId);
+        Delivery delivery = new Delivery();
+        delivery.setOrderId(orderId);
+        delivery.setStatus(DeliveryStatus.PLACED);
+        delivery.setCustomerAddress(order.getCustomerAddress());
+
+        // Calculate route
+        Route route = directionsClient.calculateRoute(ORIGIN_ADDRESS,order.getCustomerAddress());
+        //delivery.setRoute(route);
+
+        // Estimate delivery time based on route duration
+        delivery.setEstimatedDeliveryTime(LocalDateTime.now().plusSeconds(route.getDurationInSeconds()));
+
+        return deliveryRepository.save(delivery);
+    }
     @Override
     public Delivery createDelivery(Delivery delivery) {
         return deliveryRepository.save(delivery);
@@ -51,11 +82,6 @@ public class DeliveryGateway implements IDeliveryGateway {
         return deliveryList;
     }
 
-    public List<Delivery> findDeliverysByIdDeliveryMan(String idDeliveryMan) {
-        List<Delivery> deliveryList = deliveryRepository.findDeliverysByIdDeliveryMan(UUID.fromString(idDeliveryMan));
-        Collections.sort(deliveryList, Comparator.comparing(Delivery::getCepCustomer));
-        return deliveryList;
-    }
 
     public static UUID getCustomerIdFromOrder(UUID idOrder) {
         String url = "http://localhost:8082/orders/" + idOrder;

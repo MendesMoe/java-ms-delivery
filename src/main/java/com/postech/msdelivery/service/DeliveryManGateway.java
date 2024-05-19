@@ -1,4 +1,4 @@
-package com.postech.msdelivery.gateway;
+package com.postech.msdelivery.service;
 
 import com.postech.msdelivery.entity.DeliveryMan;
 import com.postech.msdelivery.interfaces.IDeliveryManGateway;
