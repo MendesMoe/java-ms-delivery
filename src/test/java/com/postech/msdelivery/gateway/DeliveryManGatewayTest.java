@@ -6,6 +6,8 @@ import com.postech.msdelivery.repository.DeliveryManRepository;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.when;
+
+import com.postech.msdelivery.service.DeliveryManGateway;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;

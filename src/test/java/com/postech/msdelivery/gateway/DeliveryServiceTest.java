@@ -2,6 +2,7 @@ package com.postech.msdelivery.gateway;
 
 import com.postech.msdelivery.entity.Delivery;
 import com.postech.msdelivery.repository.DeliveryRepository;
+import com.postech.msdelivery.service.DeliveryService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
@@ -10,15 +11,14 @@ import org.mockito.MockitoAnnotations;
 
 import java.util.List;
 import java.util.Optional;
-import java.util.UUID;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.when;
 
-public class DeliveryGatewayTest {
+public class DeliveryServiceTest {
     @InjectMocks
-    private DeliveryGateway deliveryGateway;
+    private DeliveryService deliveryService;
 
     @Mock
     private DeliveryRepository deliveryRepository;
@@ -36,7 +36,7 @@ public class DeliveryGatewayTest {
         when(deliveryRepository.save(delivery)).thenReturn(delivery);
 
         // Act
-        Delivery result = deliveryGateway.createDelivery(delivery);
+        Delivery result = deliveryService.createDelivery(delivery);
 
         // Assert
         assertEquals(delivery, result);
@@ -50,7 +50,7 @@ public class DeliveryGatewayTest {
         when(deliveryRepository.save(delivery)).thenReturn(delivery);
 
         // Act
-        Delivery result = deliveryGateway.updateDelivery(delivery);
+        Delivery result = deliveryService.updateDelivery(delivery);
 
         // Assert
         assertEquals(delivery, result);
@@ -64,7 +64,7 @@ public class DeliveryGatewayTest {
         doNothing().when(deliveryRepository).deleteById(deliveryId);
 
         // Act
-        boolean result = deliveryGateway.deleteDelivery(deliveryId);
+        boolean result = deliveryService.deleteDelivery(deliveryId);
 
         // Assert
         assertTrue(result);
@@ -76,7 +76,7 @@ public class DeliveryGatewayTest {
         Long invalidDeliveryId = 123l;
 
         // Act
-        boolean result = deliveryGateway.deleteDelivery(invalidDeliveryId);
+        boolean result = deliveryService.deleteDelivery(invalidDeliveryId);
 
         // Assert
         assertFalse(result);
@@ -91,7 +91,7 @@ public class DeliveryGatewayTest {
         when(deliveryRepository.findById(deliveryId)).thenReturn(Optional.of(expectedDelivery));
 
         // Act
-        Delivery result = deliveryGateway.findDelivery(deliveryId);
+        Delivery result = deliveryService.findDelivery(deliveryId);
 
         // Assert
         assertEquals(expectedDelivery, result);
@@ -102,7 +102,7 @@ public class DeliveryGatewayTest {
         // Arrange
         Long invalidDeliveryId = 5l;
         // Act
-        Delivery result = deliveryGateway.findDelivery(invalidDeliveryId);
+        Delivery result = deliveryService.findDelivery(invalidDeliveryId);
 
         // Assert
         assertNull(result);
@@ -116,7 +116,7 @@ public class DeliveryGatewayTest {
         when(deliveryRepository.findAll()).thenReturn(expectedDeliverys);
 
         // Act
-        List<Delivery> result = deliveryGateway.listAllDeliverys();
+        List<Delivery> result = deliveryService.listAllDeliverys();
 
         // Assert
         assertEquals(expectedDeliverys, result);

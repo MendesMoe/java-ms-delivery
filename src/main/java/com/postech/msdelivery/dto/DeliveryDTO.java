@@ -16,7 +16,7 @@ public class DeliveryDTO {
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     private String deliveryStartDate;
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
-    private String expectedDeliveryEndDate;
+    private String estimatedDeliveryTime;
     private String status;
     private Object deliveryPersonDTO;
 
@@ -24,8 +24,8 @@ public class DeliveryDTO {
         this.orderId = orderId;
         this.deliveryPersonDTO = new Object();
         this.deliveryStartDate = "2000-01-01 00:00:00";
-        this.expectedDeliveryEndDate = "2000-01-01 00:00:00";
-        this.status = DeliveryStatus.ASSIGNED.name();
+        this.estimatedDeliveryTime = "2000-01-01 00:00:00";
+        this.status = DeliveryStatus.PLACED.name();
     }
 
 

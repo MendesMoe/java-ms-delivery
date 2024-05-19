@@ -34,8 +34,11 @@ public class Delivery {
     @Column(nullable = false)
     private LocalDateTime startDate;
 
-    @Column(nullable = false)
-    private LocalDateTime expectedEndDate;
+    @Column
+    private LocalDateTime estimatedDeliveryTime;
+
+    @Column
+    private String customerAddress;
 
     @Column(nullable = false)
     private BigDecimal currentLatitude;
@@ -71,6 +74,6 @@ public class Delivery {
         this.status = DeliveryStatus.valueOf(deliveryDTO.getStatus());
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
         this.startDate = LocalDateTime.parse(deliveryDTO.getDeliveryStartDate(), formatter);
-        this.expectedEndDate = LocalDateTime.parse(deliveryDTO.getExpectedDeliveryEndDate(), formatter);
+        this.estimatedDeliveryTime = LocalDateTime.parse(deliveryDTO.getEstimatedDeliveryTime(), formatter);
     }
 }

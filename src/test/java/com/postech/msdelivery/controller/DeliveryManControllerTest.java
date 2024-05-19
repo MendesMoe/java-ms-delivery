@@ -2,7 +2,7 @@ package com.postech.msdelivery.controller;
 
 import com.postech.msdelivery.dto.DeliveryManDTO;
 import com.postech.msdelivery.entity.DeliveryMan;
-import com.postech.msdelivery.gateway.DeliveryManGateway;
+import com.postech.msdelivery.service.DeliveryManGateway;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;

@@ -29,16 +29,16 @@ public class DeliveryPerson {
     @Email(message = "Invalid email format")
     @NotBlank(message = "Email cannot be empty")
     @UniqueEmail
-    @Column(nullable = false, unique = true) // Ensure unique email
+    @Column(nullable = false, unique = true)
     private String email;
 
     @Column(nullable = false)
     private boolean available;
 
-    // @Column(nullable = false)  // Uncomment if needed
+    // @Column(nullable = false)
     // private BigDecimal latitude;
 
-    // @Column(nullable = false)  // Uncomment if needed
+    // @Column(nullable = false)
     // private BigDecimal longitude;
 
     @CreatedDate

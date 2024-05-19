@@ -1,19 +1,19 @@
 package com.postech.msdelivery.controller;
 import com.postech.msdelivery.dto.DeliveryManDTO;
 import com.postech.msdelivery.entity.DeliveryMan;
-import com.postech.msdelivery.gateway.DeliveryManGateway;
+import com.postech.msdelivery.service.DeliveryManGateway;
 import com.postech.msdelivery.usecase.DeliveryManUseCase;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
-import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import javax.validation.Valid;
 import java.util.List;
 import java.util.UUID;
 

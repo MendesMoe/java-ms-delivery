@@ -3,14 +3,13 @@ package com.postech.msdelivery.controller;
 import com.postech.msdelivery.dto.DeliveryDTO;
 import com.postech.msdelivery.entity.Delivery;
 import com.postech.msdelivery.entity.DeliveryMan;
-import com.postech.msdelivery.gateway.DeliveryGateway;
-import com.postech.msdelivery.gateway.DeliveryManGateway;
+import com.postech.msdelivery.service.DeliveryService;
+import com.postech.msdelivery.service.DeliveryManGateway;
 import com.postech.msdelivery.usecase.DeliveryUseCase;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
-import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.jetbrains.annotations.NotNull;
@@ -19,6 +18,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.client.HttpClientErrorException;
 
+import javax.validation.Valid;
 import java.util.List;
 import java.util.UUID;
 
@@ -28,7 +28,7 @@ import java.util.UUID;
 @RequiredArgsConstructor
 public class DeliveryController {
 
-    private final DeliveryGateway deliveryGateway;
+    private final DeliveryService deliveryService;
     private final DeliveryManGateway deliveryManGateway;
 
     @PostMapping("")
@@ -36,7 +36,7 @@ public class DeliveryController {
             @ApiResponse(description = "The Delivery was updated", responseCode = "200")
     })
     public ResponseEntity<?> createDelivery(@Valid @RequestBody DeliveryDTO deliveryDTO) {
-        log.info("PostMapping - createDelivery [{}]", deliveryDTO.getIdOrder());
+        log.info("PostMapping - createDelivery [{}]", deliveryDTO.getOrderId());
         try {
             Delivery deliveryNew = new Delivery(deliveryDTO);
             return saveNewDelivery(deliveryNew);
@@ -54,20 +54,20 @@ public class DeliveryController {
     public ResponseEntity<?> updateDelivery(@RequestBody @Valid DeliveryDTO deliveryDTO) {
         log.info("update Delivery [{}]", deliveryDTO.getId());
         try {
-            Delivery deliveryToSave = deliveryGateway.findDelivery(deliveryDTO.getId());
+            Delivery deliveryToSave = deliveryService.findDelivery(Long.valueOf(deliveryDTO.getId()));
             Delivery deliveryRequest = new Delivery(deliveryDTO);
 
-            deliveryToSave.setIdDeliveryMan(deliveryRequest.getIdDeliveryMan() != null ?
-                    deliveryRequest.getIdDeliveryMan() : deliveryToSave.getIdDeliveryMan());
-
-            deliveryToSave.setStatus(deliveryRequest.getStatus() != 0 ?
-                    deliveryRequest.getStatus() : deliveryToSave.getStatus());
-
-            deliveryToSave.setDeliveryStartDate(deliveryRequest.getDeliveryStartDate() != null ?
-                    deliveryRequest.getDeliveryStartDate() : deliveryToSave.getDeliveryStartDate());
-
-            deliveryToSave.setExpectedDeliveryEndDate(deliveryRequest.getExpectedDeliveryEndDate() != null ?
-                    deliveryRequest.getExpectedDeliveryEndDate() : deliveryToSave.getExpectedDeliveryEndDate());
+//            deliveryToSave.setIdDeliveryMan(deliveryRequest.getIdDeliveryMan() != null ?
+//                    deliveryRequest.getIdDeliveryMan() : deliveryToSave.getIdDeliveryMan());
+//
+//            deliveryToSave.setStatus(deliveryRequest.getStatus() != 0 ?
+//                    deliveryRequest.getStatus() : deliveryToSave.getStatus());
+//
+//            deliveryToSave.setDeliveryStartDate(deliveryRequest.getDeliveryStartDate() != null ?
+//                    deliveryRequest.getDeliveryStartDate() : deliveryToSave.getDeliveryStartDate());
+//
+//            deliveryToSave.setExpectedDeliveryEndDate(deliveryRequest.getExpectedDeliveryEndDate() != null ?
+//                    deliveryRequest.getExpectedDeliveryEndDate() : deliveryToSave.getExpectedDeliveryEndDate());
 
             return saveNewDelivery(deliveryToSave);
         } catch (HttpClientErrorException enf) {
@@ -79,19 +79,19 @@ public class DeliveryController {
 
     @NotNull
     private ResponseEntity<?> saveNewDelivery(Delivery deliveryToSave) {
-        DeliveryMan DeliveryMan = deliveryManGateway.findDeliveryMan(deliveryToSave.getIdDeliveryMan().toString());
+       /* DeliveryMan DeliveryMan = deliveryManGateway.findDeliveryMan(deliveryToSave.getIdDeliveryMan().toString());
         deliveryToSave.setIdDeliveryMan(DeliveryMan == null ? null : deliveryToSave.getIdDeliveryMan());
 
-        UUID idCustomer = deliveryGateway.getCustomerId(deliveryToSave.getIdOrder());
+        UUID idCustomer = deliveryService.getCustomerId(deliveryToSave.getIdOrder());
         deliveryToSave.setIdOrder(idCustomer == null ? null : deliveryToSave.getIdOrder());
-
+*/
         if (DeliveryUseCase.validateSaveDelivery(deliveryToSave)) {
-            Delivery deliveryCreated = deliveryGateway.createDelivery(deliveryToSave);
+            Delivery deliveryCreated = deliveryService.createDelivery(deliveryToSave);
             return new ResponseEntity<>(deliveryCreated, HttpStatus.CREATED);
         } else {
             return new ResponseEntity<>("Não foi possivel criar a entrega"
-                    + (deliveryToSave.getIdOrder() == null ? " [Pedido ou Cliente inválido]" : "")
-                    + (deliveryToSave.getIdDeliveryMan() == null ? " [Entregador inválido]" : "")
+                    + (deliveryToSave.getOrderId() == null ? " [Pedido ou Cliente inválido]" : "")
+                    + (deliveryToSave.getDeliveryPerson().getName() == null ? " [Entregador inválido]" : "")
                     + "."
                     , HttpStatus.BAD_REQUEST);
         }
@@ -103,7 +103,7 @@ public class DeliveryController {
     })
     public ResponseEntity<List<Delivery>> listAllDeliverys() {
         log.info("GetAllDeliverys");
-        List<Delivery> delivery = deliveryGateway.listAllDeliverys();
+        List<Delivery> delivery = deliveryService.listAllDeliverys();
         return new ResponseEntity<>(delivery, HttpStatus.OK);
     }
 
@@ -114,7 +114,7 @@ public class DeliveryController {
     })
     public ResponseEntity<?> findDelivery(@PathVariable String id) {
         log.info("GetMapping - FindDelivery");
-        Delivery delivery = deliveryGateway.findDelivery(id);
+        Delivery delivery = deliveryService.findDelivery(Long.valueOf(id));
         if (delivery != null) {
             return new ResponseEntity<>(delivery, HttpStatus.OK);
         }
@@ -127,7 +127,7 @@ public class DeliveryController {
     })
     public ResponseEntity<List<Delivery>> listAllDeliverysBestRoute(@PathVariable String idDeliveryMan) {
         log.info("Get Best Route");
-        List<Delivery> delivery = deliveryGateway.findDeliverysByIdDeliveryMan(idDeliveryMan);
-        return new ResponseEntity<>(delivery, HttpStatus.OK);
+       // List<Delivery> delivery = deliveryService.findDeliverysByIdDeliveryMan(idDeliveryMan);
+        return new ResponseEntity<>(null, HttpStatus.OK);
     }
 }
