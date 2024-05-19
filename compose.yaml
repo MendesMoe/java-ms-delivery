@@ -21,6 +21,7 @@ services:
       dockerfile: Dockerfile
     depends_on:
       - mysql-delivery
+    hostname: "ms-delivery"
     environment:
       MYSQL_HOSTNAME: mysql-delivery
       MYSQL_PORT: 3306
@@ -32,3 +33,4 @@ services:
 networks:
   my_network:
     driver: bridge
+    external: true

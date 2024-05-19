@@ -19,7 +19,7 @@ WORKDIR /app
 
 COPY --from=build /app/target/*.jar /app/msdelivery.jar
 
-CMD ["java", "-jar", "/app/msdelivery.jar"]
+#CMD ["java", "-jar", "/app/msdelivery.jar"]
 
 
 # Instalando wait-for-it.sh para poder esperar o rabbit e mongo
