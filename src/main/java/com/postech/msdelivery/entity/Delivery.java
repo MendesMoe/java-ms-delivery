@@ -1,5 +1,6 @@
 package com.postech.msdelivery.entity;
 
+import com.postech.msdelivery.client.Route;
 import com.postech.msdelivery.dto.DeliveryDTO;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
@@ -75,5 +76,9 @@ public class Delivery {
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
         this.startDate = LocalDateTime.parse(deliveryDTO.getDeliveryStartDate(), formatter);
         this.estimatedDeliveryTime = LocalDateTime.parse(deliveryDTO.getEstimatedDeliveryTime(), formatter);
+    }
+
+    public Route getRoute() {
+        return null;
     }
 }

@@ -17,4 +17,5 @@ public interface IDeliveryService {
 
     public List<Delivery> listAllDeliverys();
 
+    Delivery getDeliveryById(Long id);
 }

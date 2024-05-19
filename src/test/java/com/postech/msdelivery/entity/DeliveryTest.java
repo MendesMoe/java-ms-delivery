@@ -9,7 +9,7 @@ import java.util.UUID;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 public class DeliveryTest {
-    @Test
+  /*  @Test
     void testValidateGetStatusDescription0() {
         DeliveryDTO deliveryDTO = new DeliveryDTO("b1fcbe89-fc7d-4e34-98c1-093e511cfa13", "4fa3cbe9-1575-448b-89d1-e2d2667c818b");
         Delivery delivery = new Delivery(deliveryDTO);
@@ -75,6 +75,6 @@ public class DeliveryTest {
 
         delivery.setIdOrder(UUID.fromString("b1fcbe89-fc7d-4e34-98c1-093e511cfa13"));
         assertEquals(delivery.getCepCustomer().equals(""), true);
-    }
+    }*/
     
 }

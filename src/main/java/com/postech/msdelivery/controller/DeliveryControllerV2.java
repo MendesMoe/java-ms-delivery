@@ -1,12 +1,12 @@
 package com.postech.msdelivery.controller;
 
-import com.postech.msdelivery.dto.DeliveryDTO;
 import com.postech.msdelivery.entity.Delivery;
-import com.postech.msdelivery.usecase.CreateDeliveryUseCase;
-import com.postech.msdelivery.usecase.response.DeliveryResponse;
-import lombok.AllArgsConstructor;
+import com.postech.msdelivery.exception.ResourceNotFoundException;
+import com.postech.msdelivery.service.DeliveryService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -16,39 +16,22 @@ import org.springframework.web.bind.annotation.*;
 @RequestMapping("/deliveries")
 public class DeliveryControllerV2 {
 
-    private final CreateDeliveryUseCase createDeliveryUseCase;
-    /*private final GetDeliveryUseCase getDeliveryUseCase;
-    private final UpdateDeliveryUseCase updateDeliveryUseCase;
-    private final DeliveryMapper deliveryMapper;*/
-
+   @Autowired
+    private DeliveryService deliveryService;
 
     @PostMapping
-    public ResponseEntity<DeliveryResponse> createDelivery(@RequestBody DeliveryDTO deliveryDTO) {
-        //CreateDeliveryRequest request = deliveryMapper.toCreateDeliveryRequest(deliveryDTO);
-        DeliveryResponse response = createDeliveryUseCase.execute(deliveryDTO);
-        return buildDeliveryResponse(response);
+    public ResponseEntity<Delivery> createDelivery(@RequestParam Long orderId) {
+        Delivery delivery = deliveryService.createDelivery(orderId);
+        return ResponseEntity.status(HttpStatus.CREATED).body(delivery);
     }
 
-/*
-    @GetMapping("/{deliveryId}")
-    public ResponseEntity<DeliveryResponse> getDelivery(@PathVariable Long deliveryId) {
-       // GetDeliveryRequest request = new GetDeliveryRequest(deliveryId);
-        DeliveryResponse response = getDeliveryUseCase.execute(request);
-        return buildDeliveryResponse(response);
-    }
-
-    @PutMapping("/{deliveryId}")
-    public ResponseEntity<DeliveryResponse> updateDelivery(@PathVariable Long deliveryId, @RequestBody DeliveryDTO deliveryDTO) {
-        //UpdateDeliveryRequest request = deliveryMapper.toUpdateDeliveryRequest(deliveryId, deliveryDTO);
-        DeliveryResponse response = updateDeliveryUseCase.execute(request);
-        return buildDeliveryResponse(response);
-    }*/
-
-    private ResponseEntity<DeliveryResponse> buildDeliveryResponse(DeliveryResponse response) {
-        if (response.isSuccess()) {
-            return ResponseEntity.ok(response);
-        } else {
-            return ResponseEntity.badRequest().body(response);
+    @GetMapping("/{id}")
+    public ResponseEntity<Delivery> getDeliveryById(@PathVariable Long id) {
+        try {
+            Delivery delivery = deliveryService.getDeliveryById(id);
+            return ResponseEntity.ok(delivery);
+        } catch (ResourceNotFoundException e) {
+            return ResponseEntity.notFound().build();
         }
     }
 }

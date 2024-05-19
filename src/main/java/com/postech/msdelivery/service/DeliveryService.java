@@ -8,6 +8,7 @@ import com.postech.msdelivery.client.Route;
 import com.postech.msdelivery.entity.Delivery;
 import com.postech.msdelivery.entity.DeliveryStatus;
 import com.postech.msdelivery.exception.DeliveryNotFoundException;
+import com.postech.msdelivery.exception.ResourceNotFoundException;
 import com.postech.msdelivery.interfaces.IDeliveryService;
 import com.postech.msdelivery.repository.DeliveryRepository;
 import org.springframework.beans.factory.annotation.Value;
@@ -80,6 +81,12 @@ public class DeliveryService implements IDeliveryService {
     public List<Delivery> listAllDeliverys() {
         List<Delivery> deliveryList = deliveryRepository.findAll();
         return deliveryList;
+    }
+
+    @Override
+    public Delivery getDeliveryById(Long id) {
+        return deliveryRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Delivery not found with id: " + id));
     }
 
 
