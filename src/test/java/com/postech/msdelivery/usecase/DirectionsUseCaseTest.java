@@ -49,11 +49,7 @@ public class DirectionsUseCaseTest {
         mockResult.routes[0].legs[0].duration = new Duration();
         mockResult.routes[0].legs[0].duration.inSeconds = 1800; // 30 minutes
 
-        //when(DirectionsApi.newRequest(geoApiContext)).thenReturn(directionsApiRequest);
-        //when(directionsApiRequest.origin(anyString())).thenReturn(directionsApiRequest);
-        //when(directionsApiRequest.destination(anyString())).thenReturn(directionsApiRequest);
-        //when(directionsApiRequest.mode(any(TravelMode.class))).thenReturn(directionsApiRequest);
-        //when(directionsApiRequest.await()).thenReturn(mockResult);
+
 
         // Act
         long duration = directionsUseCase.calculateRoute(destination);
@@ -67,10 +63,7 @@ public class DirectionsUseCaseTest {
         // Arrange
         String destination = "Destination Address";
 
-        ///when(directionsApiRequest.origin(anyString())).thenReturn(directionsApiRequest);
-        //when(directionsApiRequest.destination(anyString())).thenReturn(directionsApiRequest);
-        //when(directionsApiRequest.mode(any(TravelMode.class))).thenReturn(directionsApiRequest);
-        //when(directionsApiRequest.await()).thenThrow(new NotFoundException(""));
+
 
         // Act & Assert
         assertThrows(NotFoundException.class, () -> directionsUseCase.calculateRoute(destination));
