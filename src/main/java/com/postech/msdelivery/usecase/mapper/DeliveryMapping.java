@@ -12,18 +12,8 @@ public interface DeliveryMapping {
 
     DeliveryMapping INSTANCE = Mappers.getMapper(DeliveryMapping.class);
 
-    @Mappings({
-            @Mapping(source = "delivery.id", target = "deliveryDTO.id"),
-            @Mapping(source = "delivery.status", target = "deliveryDTO.status"),
-            @Mapping(source = "delivery.description", target = "deliveryDTO.description"),
-    })
     DeliveryDTO toDeliveryDTO(Delivery delivery);
 
-    @Mappings({
-            @Mapping(source = "deliveryDTO.id", target = "delivery.id"),
-            @Mapping(source = "deliveryDTO.status", target = "delivery.status"),
-            @Mapping(source = "deliveryDTO.description", target = "delivery.description"),
-    })
     Delivery toDelivery(DeliveryDTO deliveryDTO);
 }
 

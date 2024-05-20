@@ -25,7 +25,7 @@ import static org.mockito.Mockito.*;
     origin.address="CEP 01001-001"
     google.maps.api.key=AIzaSyAJsgVQ7u5xrU1YNnPTe76imES7cchodj0
 """)
-public class DeliveryServiceImplTest {
+public class DeliveryServiceTest {
 
     @Mock
     private DeliveryRepository deliveryRepository;
