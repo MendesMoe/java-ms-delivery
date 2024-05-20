@@ -21,12 +21,13 @@ public class GoogleDirectionsClient {
 
     public Route calculateRoute(String origin, String destination) {
 
-        GeoApiContext context = new GeoApiContext.Builder()
-                .apiKey(apiKey)
-                .build();
-
-        DirectionsResult directionsResult;
         try {
+            GeoApiContext context = new GeoApiContext.Builder()
+                    .apiKey(apiKey)
+                    .build();
+
+            DirectionsResult directionsResult;
+
             directionsResult = DirectionsApi.newRequest(context)
                     .origin(origin)
                     .destination(destination)
@@ -38,7 +39,7 @@ public class GoogleDirectionsClient {
                     directionsResult.routes[0].legs[0].duration,
                     directionsResult.routes[0].legs[0].distance
             );
-        } catch (ApiException | InterruptedException | IOException e) {
+        } catch (Exception e) {
             log.error("Error calculating route {}", e.getMessage());
             throw new ErrorCalculatingRouteException(e.getMessage());
         }

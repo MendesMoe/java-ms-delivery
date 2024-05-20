@@ -11,7 +11,7 @@ import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
-import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.test.context.TestPropertySource;
 
 import java.time.Duration;
@@ -21,7 +21,10 @@ import java.util.UUID;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.*;
-@TestPropertySource(locations = "classpath:application-test.properties")
+@TestPropertySource(properties = """
+    origin.address="CEP 01001-001"
+    google.maps.api.key=AIzaSyAJsgVQ7u5xrU1YNnPTe76imES7cchodj0
+""")
 public class DeliveryServiceImplTest {
 
     @Mock
@@ -31,11 +34,13 @@ public class DeliveryServiceImplTest {
     @Mock
     private CustomerClient customerClient;
     @Mock
-    private GoogleDirectionsClient googleDirectionsApi;
+    private GoogleDirectionsClient directionsClient;
 
     @InjectMocks
     private DeliveryService deliveryService;
 
+    @Value("${origin.address}")
+    private String ORIGIN_ADDRESS;
     @BeforeEach
     public void setup() {
         MockitoAnnotations.openMocks(this);
@@ -52,20 +57,22 @@ public class DeliveryServiceImplTest {
         Customer customer = new Customer();
         customer.setId(customerId);
         customer.setEndereco("Rua Olimpia de Almeida Prado, 27");
+        customer.setCidade("Sao Paulo");
+        customer.setCep("01151010");
         Route route = new Route();
         route.setDurationInSeconds(Duration.ofMinutes(30).getSeconds());
 
         when(orderClient.getOrderById(orderId.toString())).thenReturn(order);
         when(customerClient.getCustomer(customer.getId().toString())).thenReturn(customer);
-        when(googleDirectionsApi.calculateRoute(anyString(), anyString())).thenReturn(route);
+        when(directionsClient.calculateRoute(anyString(), anyString())).thenReturn(route);
         when(deliveryRepository.save(any(Delivery.class))).thenAnswer(invocation -> invocation.getArgument(0));
 
         // Act
         Delivery createdDelivery = deliveryService.createDelivery(orderId.toString());
 
         // Assert
-        assertEquals(orderId, createdDelivery.getOrderUuid());
-        assertEquals("Rua Olimpia de Almeida Prado, 27, , CEP", createdDelivery.getCustomerAddress());
+        assertEquals(orderId.toString(), createdDelivery.getOrderUuid());
+        assertEquals("Rua Olimpia de Almeida Prado, 27, Sao Paulo, CEP 01151010", createdDelivery.getCustomerAddress());
         assertEquals(DeliveryStatus.PLACED, createdDelivery.getStatus());
        // assertEquals(route, createdDelivery.getRoute());
         // Assert estimated delivery time is calculated correctly

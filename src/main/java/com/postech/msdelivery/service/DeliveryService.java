@@ -36,6 +36,7 @@ public class DeliveryService implements IDeliveryService {
     @Override
     public Delivery createDelivery(String orderUuid) {
         try {
+            if(ORIGIN_ADDRESS == null) ORIGIN_ADDRESS = "CEP 01001-001";
             Order order = orderClient.getOrderById(orderUuid);
             Customer customer = customerClient.getCustomer(order.getIdCustomer().toString());
             Delivery delivery = new Delivery();
