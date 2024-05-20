@@ -25,8 +25,8 @@ public class Delivery {
     private String orderUuid;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "delivery_person_id")
-    private DeliveryPerson deliveryPerson;
+    @JoinColumn(name = "driver_id")
+    private Driver driver;
 
     @Column(nullable = false)
     @Enumerated(EnumType.STRING)
@@ -71,7 +71,7 @@ public class Delivery {
     public Delivery(DeliveryDTO deliveryDTO) {
         this.orderUuid = deliveryDTO.getOrderUuid();
         //this.deliveryPerson = deliveryDTO.getDeliveryPersonDTO();
-        this.deliveryPerson = null;
+        this.driver = null;
         this.status = DeliveryStatus.valueOf(deliveryDTO.getStatus());
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
         this.startDate = LocalDateTime.parse(deliveryDTO.getDeliveryStartDate(), formatter);

@@ -5,12 +5,13 @@ import lombok.NoArgsConstructor;
 
 import javax.validation.Valid;
 import javax.validation.constraints.Email;
+import javax.validation.constraints.NotBlank;
 
 @Data
 @NoArgsConstructor
-public class DeliveryPersonDTO {
+public class DriverDTO {
 
-    @Valid
+    @NotBlank(message = "Name is mandatory")
     private String name;
     @Valid
     @Email

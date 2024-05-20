@@ -89,7 +89,7 @@ public class DeliveryController {
         } else {
             return new ResponseEntity<>("Não foi possivel criar a entrega"
                     + (deliveryToSave.getOrderUuid() == null ? " [Pedido ou Cliente inválido]" : "")
-                    + (deliveryToSave.getDeliveryPerson().getName() == null ? " [Entregador inválido]" : "")
+                    + (deliveryToSave.getDriver().getName() == null ? " [Entregador inválido]" : "")
                     + "."
                     , HttpStatus.BAD_REQUEST);
         }

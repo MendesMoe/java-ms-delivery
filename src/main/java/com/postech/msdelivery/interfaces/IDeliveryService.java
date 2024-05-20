@@ -7,6 +7,10 @@ import java.util.List;
 public interface IDeliveryService {
     Delivery createDelivery(String orderUuid);
 
+    Delivery startDelivery(Long deliveryId);
+
+    Delivery completeDelivery(Long deliveryId);
+
     public Delivery createDelivery(Delivery delivery);
 
     public Delivery updateDelivery(Delivery delivery);

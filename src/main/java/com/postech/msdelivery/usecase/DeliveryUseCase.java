@@ -13,6 +13,6 @@ public class DeliveryUseCase {
     public static boolean validateSaveDelivery(Delivery deliveryNew) {
         return (deliveryNew != null
                 && deliveryNew.getOrderUuid() != null
-                && deliveryNew.getDeliveryPerson() != null);
+                && deliveryNew.getDriver() != null);
     }
 }

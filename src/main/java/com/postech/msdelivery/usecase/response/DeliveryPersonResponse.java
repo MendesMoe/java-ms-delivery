@@ -1,7 +1,6 @@
 package com.postech.msdelivery.usecase.response;
 
-import com.postech.msdelivery.dto.DeliveryDTO;
-import com.postech.msdelivery.dto.DeliveryPersonDTO;
+import com.postech.msdelivery.dto.DriverDTO;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 
@@ -10,12 +9,12 @@ import lombok.Data;
 public class DeliveryPersonResponse {
 
     private final boolean success;
-    private final DeliveryPersonDTO deliveryPersonDTO;
+    private final DriverDTO driverDTO;
     private final String errorMessage;
 
 
-    public DeliveryPersonResponse(DeliveryPersonDTO deliveryPersonDTO) {
-        this.deliveryPersonDTO = deliveryPersonDTO;
+    public DeliveryPersonResponse(DriverDTO driverDTO) {
+        this.driverDTO = driverDTO;
         this.success = true;
         this.errorMessage = null;
     }
@@ -23,7 +22,7 @@ public class DeliveryPersonResponse {
     public DeliveryPersonResponse(String message) {
         this.success = false;
         this.errorMessage = message;
-        this.deliveryPersonDTO = null;
+        this.driverDTO = null;
     }
 
 }

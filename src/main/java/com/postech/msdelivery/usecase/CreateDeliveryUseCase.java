@@ -22,7 +22,7 @@ public class CreateDeliveryUseCase {
         //TODO criar evento ao criar novo objeto? notificar?
         Delivery delivery = new Delivery();
         delivery.setOrderUuid(request.getOrderUuid());
-        delivery.setDeliveryPerson(null);
+        delivery.setDriver(null);
         delivery.setStatus(DeliveryStatus.PLACED);
 
         try {

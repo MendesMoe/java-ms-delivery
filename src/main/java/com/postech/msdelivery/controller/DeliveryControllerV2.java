@@ -41,5 +41,18 @@ public class DeliveryControllerV2 {
             return ResponseEntity.notFound().build();
         }
     }
+
+
+    @PutMapping("/{id}/start")
+    public ResponseEntity<Delivery> startDelivery(@PathVariable Long id) {
+        Delivery delivery = deliveryService.startDelivery(id);
+        return ResponseEntity.ok(delivery);
+    }
+
+    @PutMapping("/{id}/complete")
+    public ResponseEntity<Delivery> completeDelivery(@PathVariable Long id) {
+        Delivery delivery = deliveryService.completeDelivery(id);
+        return ResponseEntity.ok(delivery);
+    }
 }
 

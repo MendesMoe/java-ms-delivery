@@ -9,14 +9,13 @@ import org.springframework.data.annotation.LastModifiedDate;
 
 import javax.validation.constraints.Email;
 import javax.validation.constraints.NotBlank;
-import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
 @Getter
 @Setter
 @Entity
-@Table(name = "tb_delivery_person")
-public class DeliveryPerson {
+@Table(name = "tb_driver")
+public class Driver {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -50,12 +49,12 @@ public class DeliveryPerson {
     private LocalDateTime updatedAt;
 
 
-    public DeliveryPerson(String name, String email) {
+    public Driver(String name, String email) {
        this.name = name;
        this.email = email;
     }
 
     @Deprecated
-    public DeliveryPerson() {}
+    public Driver() {}
 }
 

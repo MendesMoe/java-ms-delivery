@@ -4,10 +4,12 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.postech.msdelivery.client.*;
 import com.postech.msdelivery.entity.Delivery;
 import com.postech.msdelivery.entity.DeliveryStatus;
+import com.postech.msdelivery.entity.Driver;
 import com.postech.msdelivery.exception.DeliveryNotFoundException;
 import com.postech.msdelivery.exception.ResourceNotFoundException;
 import com.postech.msdelivery.interfaces.IDeliveryService;
 import com.postech.msdelivery.repository.DeliveryRepository;
+import com.postech.msdelivery.repository.DriverRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
@@ -24,6 +26,7 @@ import java.util.*;
 public class DeliveryService implements IDeliveryService {
 
     private final DeliveryRepository deliveryRepository;
+    private final DriverRepository driverRepository;
     private final OrderClient orderClient;
     private final CustomerClient customerClient;
     private final GoogleDirectionsClient directionsClient;
@@ -46,13 +49,20 @@ public class DeliveryService implements IDeliveryService {
             String destination = parseCustomerAddress(customer);
             delivery.setCustomerAddress(destination);
 
-            // Calculate route
             Route route = directionsClient.calculateRoute(ORIGIN_ADDRESS,destination);
             //delivery.setRoute(route);
 
-            // Estimate delivery time based on route duration
             delivery.setEstimatedDeliveryTime(LocalDateTime.now().plusSeconds(route.getDurationInSeconds()));
-
+            Optional<Driver> availableDriver = driverRepository.findFirstByAvailableTrue();
+            if (availableDriver.isPresent()) {
+                delivery.setDriver(availableDriver.get());
+                availableDriver.get().setAvailable(false);
+                delivery.setStatus(DeliveryStatus.ASSIGNED);
+                log.info("Assign order {} to {}", delivery.getOrderUuid(), availableDriver.get().getId());
+                driverRepository.save(availableDriver.get());
+            } else {
+                log.info("no driver available to order {}", delivery.getOrderUuid());
+            }
             return deliveryRepository.save(delivery);
         } catch (Exception e){
             log.error("Error saving new delivery {}", e.getMessage());
@@ -78,6 +88,21 @@ public class DeliveryService implements IDeliveryService {
           log.error("Error parsing customer address {}", customer.getId());
           throw e;
         }
+    }
+
+
+    @Override
+    public Delivery startDelivery(Long deliveryId) {
+        Delivery delivery = getDeliveryById(deliveryId);
+        delivery.setStatus(DeliveryStatus.OUT_FOR_DELIVERY);
+        return deliveryRepository.save(delivery);
+    }
+
+    @Override
+    public Delivery completeDelivery(Long deliveryId) {
+        Delivery delivery = getDeliveryById(deliveryId);
+        delivery.setStatus(DeliveryStatus.DELIVERED);
+        return deliveryRepository.save(delivery);
     }
 
     @Override
