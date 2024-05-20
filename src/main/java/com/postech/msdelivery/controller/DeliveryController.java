@@ -1,11 +1,13 @@
 package com.postech.msdelivery.controller;
 
+import com.google.maps.errors.ApiException;
 import com.postech.msdelivery.dto.DeliveryDTO;
 import com.postech.msdelivery.entity.Delivery;
 import com.postech.msdelivery.entity.DeliveryMan;
 import com.postech.msdelivery.gateway.DeliveryGateway;
 import com.postech.msdelivery.gateway.DeliveryManGateway;
 import com.postech.msdelivery.usecase.DeliveryUseCase;
+import com.postech.msdelivery.usecase.DirectionsUseCase;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -19,6 +21,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.client.HttpClientErrorException;
 
+import java.io.IOException;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.UUID;
 
@@ -30,6 +34,7 @@ public class DeliveryController {
 
     private final DeliveryGateway deliveryGateway;
     private final DeliveryManGateway deliveryManGateway;
+    private final DirectionsUseCase directionsUseCase;
 
     @PostMapping("")
     @Operation(summary = "Request for create a Delivery", responses = {
@@ -78,7 +83,7 @@ public class DeliveryController {
     }
 
     @NotNull
-    private ResponseEntity<?> saveNewDelivery(Delivery deliveryToSave) {
+    private ResponseEntity<?> saveNewDelivery(Delivery deliveryToSave) throws IOException, InterruptedException, ApiException {
         DeliveryMan DeliveryMan = deliveryManGateway.findDeliveryMan(deliveryToSave.getIdDeliveryMan().toString());
         deliveryToSave.setIdDeliveryMan(DeliveryMan == null ? null : deliveryToSave.getIdDeliveryMan());
 
@@ -86,6 +91,10 @@ public class DeliveryController {
         deliveryToSave.setIdOrder(idCustomer == null ? null : deliveryToSave.getIdOrder());
 
         if (DeliveryUseCase.validateSaveDelivery(deliveryToSave)) {
+
+            long durationInSec = directionsUseCase.calculateRoute(deliveryToSave.getCepCustomer());
+            deliveryToSave.setExpectedDeliveryEndDate(LocalDateTime.now().plusSeconds(durationInSec));
+
             Delivery deliveryCreated = deliveryGateway.createDelivery(deliveryToSave);
             return new ResponseEntity<>(deliveryCreated, HttpStatus.CREATED);
         } else {

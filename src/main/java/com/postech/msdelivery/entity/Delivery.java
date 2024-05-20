@@ -54,7 +54,7 @@ public class Delivery {
     }
 
     public Delivery(DeliveryDTO deliveryDTO) {
-        this.id = UUID.randomUUID();
+        this.id = deliveryDTO.getId() != null ? UUID.fromString(deliveryDTO.getId()) : UUID.randomUUID();
         this.idOrder = UUID.fromString(deliveryDTO.getIdOrder());
         this.idDeliveryMan = UUID.fromString(deliveryDTO.getIdDeliveryMan());
         this.status = deliveryDTO.getStatus();
