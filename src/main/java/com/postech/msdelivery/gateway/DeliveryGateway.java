@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.postech.msdelivery.entity.Delivery;
 import com.postech.msdelivery.interfaces.IDeliveryGateway;
 import com.postech.msdelivery.repository.DeliveryRepository;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestTemplate;
@@ -14,6 +15,19 @@ import java.util.*;
 public class DeliveryGateway implements IDeliveryGateway {
     private final DeliveryRepository deliveryRepository;
     static RestTemplate restTemplate = new RestTemplate();
+    private static String msCustomersUrl;
+
+    private static String msOrdersUrl;
+
+    @Value("${api.mscustomers.url}")
+    public void setMsCustomersUrl(String msCustomersUrl) {
+        this.msCustomersUrl = msCustomersUrl;
+    }
+
+    @Value("${api.msorders.url}")
+    public void setMsOrdersUrl(String msOrdersUrl) {
+        this.msOrdersUrl = msOrdersUrl;
+    }
 
     public DeliveryGateway(DeliveryRepository deliveryRepository) {
         this.deliveryRepository = deliveryRepository;
@@ -63,17 +77,17 @@ public class DeliveryGateway implements IDeliveryGateway {
     }
 
     public static UUID getCustomerIdFromOrder(UUID idOrder) {
-        String url = "http://localhost:8082/orders/" + idOrder;
+        String url = msOrdersUrl + "/" + idOrder;
         return UUID.fromString(FieldFromMap(url, "idCustomer"));
     }
 
     public UUID getCustomerId(UUID idOrder) {
-        String url = "http://localhost:8082/orders/" + idOrder;
-        return UUID.fromString(FieldFromMap(url, "cep"));
+        String url = msOrdersUrl + "/" + idOrder;
+        return UUID.fromString(FieldFromMap(url, "idCustomer"));
     }
 
     public static String getCepCustomer(UUID idCustomer) {
-        String url = "http://localhost:8081/customers/" + idCustomer;
+        String url = msCustomersUrl + "/"  + idCustomer;
         return FieldFromMap(url, "cep");
     }
 
