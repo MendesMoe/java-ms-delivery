@@ -1,16 +1,15 @@
 package com.postech.msdelivery.service;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.postech.msdelivery.client.GoogleDirectionsClient;
-import com.postech.msdelivery.client.Order;
-import com.postech.msdelivery.client.OrderClient;
-import com.postech.msdelivery.client.Route;
+import com.postech.msdelivery.client.*;
 import com.postech.msdelivery.entity.Delivery;
 import com.postech.msdelivery.entity.DeliveryStatus;
 import com.postech.msdelivery.exception.DeliveryNotFoundException;
 import com.postech.msdelivery.exception.ResourceNotFoundException;
 import com.postech.msdelivery.interfaces.IDeliveryService;
 import com.postech.msdelivery.repository.DeliveryRepository;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
@@ -19,39 +18,67 @@ import org.springframework.web.client.RestTemplate;
 import java.time.LocalDateTime;
 import java.util.*;
 
+@Slf4j
 @Service
+@RequiredArgsConstructor
 public class DeliveryService implements IDeliveryService {
+
     private final DeliveryRepository deliveryRepository;
     private final OrderClient orderClient;
+    private final CustomerClient customerClient;
     private final GoogleDirectionsClient directionsClient;
 
     @Value("${origin.address}")
     private String ORIGIN_ADDRESS;
     static RestTemplate restTemplate = new RestTemplate();
 
-    public DeliveryService(DeliveryRepository deliveryRepository, OrderClient orderClient, GoogleDirectionsClient directionsClient) {
-        this.deliveryRepository = deliveryRepository;
-        this.orderClient = orderClient;
-        this.directionsClient = directionsClient;
-    }
 
     @Override
-    public Delivery createDelivery(Long orderId) {
-        Order order = orderClient.getOrderById(orderId);
-        Delivery delivery = new Delivery();
-        delivery.setOrderId(orderId);
-        delivery.setStatus(DeliveryStatus.PLACED);
-        delivery.setCustomerAddress(order.getCustomerAddress());
+    public Delivery createDelivery(String orderUuid) {
+        try {
+            Order order = orderClient.getOrderById(orderUuid);
+            Customer customer = customerClient.getCustomer(order.getIdCustomer().toString());
+            Delivery delivery = new Delivery();
+            delivery.setOrderUuid(orderUuid);
+            delivery.setStatus(DeliveryStatus.PLACED);
 
-        // Calculate route
-        Route route = directionsClient.calculateRoute(ORIGIN_ADDRESS,order.getCustomerAddress());
-        //delivery.setRoute(route);
+            String destination = parseCustomerAddress(customer);
+            delivery.setCustomerAddress(destination);
 
-        // Estimate delivery time based on route duration
-        delivery.setEstimatedDeliveryTime(LocalDateTime.now().plusSeconds(route.getDurationInSeconds()));
+            // Calculate route
+            Route route = directionsClient.calculateRoute(ORIGIN_ADDRESS,destination);
+            //delivery.setRoute(route);
 
-        return deliveryRepository.save(delivery);
+            // Estimate delivery time based on route duration
+            delivery.setEstimatedDeliveryTime(LocalDateTime.now().plusSeconds(route.getDurationInSeconds()));
+
+            return deliveryRepository.save(delivery);
+        } catch (Exception e){
+            log.error("Error saving new delivery {}", e.getMessage());
+            throw e;
+        }
+
     }
+
+    private String parseCustomerAddress(Customer customer) {
+        try {
+            String destination;
+            StringBuilder stringBuilder = new StringBuilder();
+            destination = stringBuilder
+                    .append(customer.getEndereco())
+                    .append(", ")
+                    .append(customer.getCidade())
+                    .append(", ")
+                    .append("CEP ")
+                    .append(customer.getCep())
+                    .toString();
+            return destination;
+        } catch (Exception e){
+          log.error("Error parsing customer address {}", customer.getId());
+          throw e;
+        }
+    }
+
     @Override
     public Delivery createDelivery(Delivery delivery) {
         return deliveryRepository.save(delivery);

@@ -12,7 +12,7 @@ import org.springframework.stereotype.Service;
 public class DeliveryUseCase {
     public static boolean validateSaveDelivery(Delivery deliveryNew) {
         return (deliveryNew != null
-                && deliveryNew.getOrderId() != null
+                && deliveryNew.getOrderUuid() != null
                 && deliveryNew.getDeliveryPerson() != null);
     }
 }

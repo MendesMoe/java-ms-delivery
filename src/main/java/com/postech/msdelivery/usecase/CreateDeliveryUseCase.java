@@ -21,7 +21,7 @@ public class CreateDeliveryUseCase {
     public DeliveryResponse execute(DeliveryDTO request) {
         //TODO criar evento ao criar novo objeto? notificar?
         Delivery delivery = new Delivery();
-        delivery.setOrderId(request.getOrderId());
+        delivery.setOrderUuid(request.getOrderUuid());
         delivery.setDeliveryPerson(null);
         delivery.setStatus(DeliveryStatus.PLACED);
 

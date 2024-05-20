@@ -12,7 +12,7 @@ import javax.validation.constraints.NotNull;
 public class DeliveryDTO {
     private String id;
     @NotNull
-    private Long orderId;
+    private String orderUuid;
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     private String deliveryStartDate;
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
@@ -20,8 +20,8 @@ public class DeliveryDTO {
     private String status;
     private Object deliveryPersonDTO;
 
-    public DeliveryDTO(Long orderId) {
-        this.orderId = orderId;
+    public DeliveryDTO(String orderUuid) {
+        this.orderUuid = orderUuid;
         this.deliveryPersonDTO = new Object();
         this.deliveryStartDate = "2000-01-01 00:00:00";
         this.estimatedDeliveryTime = "2000-01-01 00:00:00";

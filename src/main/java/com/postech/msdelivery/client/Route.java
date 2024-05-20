@@ -18,9 +18,9 @@ public class Route {
     @Transient
     private List<LatLng> waypoints;
 
-    private Long durationInSeconds; // Store duration in seconds
+    private Long durationInSeconds;
 
-    private Long distanceInMeters; // Store distance in meters
+    private Long distanceInMeters;
 
     public Route(List<LatLng> waypoints, Duration duration, Distance distance) {
         this.waypoints = waypoints;

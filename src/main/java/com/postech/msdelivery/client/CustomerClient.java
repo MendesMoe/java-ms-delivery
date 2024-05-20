@@ -4,9 +4,9 @@ import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 
-@FeignClient(name = "ms-order", url="${ms-order.url}")
-public interface OrderClient {
-    @GetMapping("/orders/{orderId}")
-    Order getOrderById(@PathVariable String orderId);
+@FeignClient(name = "ms-customer", url="${ms-customer.url}")
+public interface CustomerClient {
+    @GetMapping("/customers/{customerUuid}")
+    Customer getCustomer(@PathVariable String uuid);
 }
 

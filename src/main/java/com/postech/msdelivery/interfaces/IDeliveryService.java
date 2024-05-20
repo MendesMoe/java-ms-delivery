@@ -5,7 +5,7 @@ import com.postech.msdelivery.entity.Delivery;
 import java.util.List;
 
 public interface IDeliveryService {
-    Delivery createDelivery(Long orderId);
+    Delivery createDelivery(String orderUuid);
 
     public Delivery createDelivery(Delivery delivery);
 

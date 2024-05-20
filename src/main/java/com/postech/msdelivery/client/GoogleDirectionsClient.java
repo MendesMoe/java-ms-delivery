@@ -5,11 +5,14 @@ import com.google.maps.GeoApiContext;
 import com.google.maps.errors.ApiException;
 import com.google.maps.model.DirectionsResult;
 import com.google.maps.model.TravelMode;
+import com.postech.msdelivery.exception.ErrorCalculatingRouteException;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 import java.io.IOException;
 
+@Slf4j
 @Component
 public class GoogleDirectionsClient {
 
@@ -17,6 +20,7 @@ public class GoogleDirectionsClient {
     private String apiKey;
 
     public Route calculateRoute(String origin, String destination) {
+
         GeoApiContext context = new GeoApiContext.Builder()
                 .apiKey(apiKey)
                 .build();
@@ -26,19 +30,19 @@ public class GoogleDirectionsClient {
             directionsResult = DirectionsApi.newRequest(context)
                     .origin(origin)
                     .destination(destination)
-                    .mode(TravelMode.DRIVING) // Adjust as needed
+                    .mode(TravelMode.DRIVING)
                     .await();
+            context.shutdown();
+            return new Route(
+                    directionsResult.routes[0].overviewPolyline.decodePath(),
+                    directionsResult.routes[0].legs[0].duration,
+                    directionsResult.routes[0].legs[0].distance
+            );
         } catch (ApiException | InterruptedException | IOException e) {
-            // Handle exceptions (e.g., log error, throw custom exception)
-            throw new RuntimeException("Error calculating route", e);
+            log.error("Error calculating route {}", e.getMessage());
+            throw new ErrorCalculatingRouteException(e.getMessage());
         }
 
-        // Extract route information from the result
-        return new Route(
-                directionsResult.routes[0].overviewPolyline.decodePath(),
-                directionsResult.routes[0].legs[0].duration,
-                directionsResult.routes[0].legs[0].distance
-        );
     }
 }
 

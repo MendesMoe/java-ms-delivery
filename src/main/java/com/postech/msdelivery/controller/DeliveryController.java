@@ -2,7 +2,6 @@ package com.postech.msdelivery.controller;
 
 import com.postech.msdelivery.dto.DeliveryDTO;
 import com.postech.msdelivery.entity.Delivery;
-import com.postech.msdelivery.entity.DeliveryMan;
 import com.postech.msdelivery.service.DeliveryService;
 import com.postech.msdelivery.service.DeliveryManGateway;
 import com.postech.msdelivery.usecase.DeliveryUseCase;
@@ -20,7 +19,6 @@ import org.springframework.web.client.HttpClientErrorException;
 
 import javax.validation.Valid;
 import java.util.List;
-import java.util.UUID;
 
 @Slf4j
 @RestController
@@ -36,7 +34,7 @@ public class DeliveryController {
             @ApiResponse(description = "The Delivery was updated", responseCode = "200")
     })
     public ResponseEntity<?> createDelivery(@Valid @RequestBody DeliveryDTO deliveryDTO) {
-        log.info("PostMapping - createDelivery [{}]", deliveryDTO.getOrderId());
+        log.info("PostMapping - createDelivery [{}]", deliveryDTO.getOrderUuid());
         try {
             Delivery deliveryNew = new Delivery(deliveryDTO);
             return saveNewDelivery(deliveryNew);
@@ -90,7 +88,7 @@ public class DeliveryController {
             return new ResponseEntity<>(deliveryCreated, HttpStatus.CREATED);
         } else {
             return new ResponseEntity<>("Não foi possivel criar a entrega"
-                    + (deliveryToSave.getOrderId() == null ? " [Pedido ou Cliente inválido]" : "")
+                    + (deliveryToSave.getOrderUuid() == null ? " [Pedido ou Cliente inválido]" : "")
                     + (deliveryToSave.getDeliveryPerson().getName() == null ? " [Entregador inválido]" : "")
                     + "."
                     , HttpStatus.BAD_REQUEST);

@@ -21,8 +21,8 @@ public class Delivery {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(name = "order_id")
-    private Long orderId;
+    @Column(name = "order_uuid")
+    private String orderUuid;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "delivery_person_id")
@@ -69,7 +69,7 @@ public class Delivery {
     }
 
     public Delivery(DeliveryDTO deliveryDTO) {
-        this.orderId = deliveryDTO.getOrderId();
+        this.orderUuid = deliveryDTO.getOrderUuid();
         //this.deliveryPerson = deliveryDTO.getDeliveryPersonDTO();
         this.deliveryPerson = null;
         this.status = DeliveryStatus.valueOf(deliveryDTO.getStatus());
