@@ -5,6 +5,7 @@ import com.postech.msdelivery.entity.Delivery;
 import com.postech.msdelivery.entity.DeliveryMan;
 import com.postech.msdelivery.gateway.DeliveryGateway;
 import com.postech.msdelivery.gateway.DeliveryManGateway;
+import com.postech.msdelivery.usecase.DirectionsUseCase;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -14,12 +15,14 @@ import org.mockito.MockitoAnnotations;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 
+import java.time.Duration;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.when;
 
 class DeliveryControllerTest {
@@ -28,6 +31,9 @@ class DeliveryControllerTest {
     private DeliveryGateway deliveryGateway;
     @Mock
     private DeliveryManGateway deliveryManGateway;
+    @Mock
+    private DirectionsUseCase directionsUseCase;
+
     @InjectMocks
     private DeliveryController deliveryController;
 
@@ -50,6 +56,7 @@ class DeliveryControllerTest {
             when(deliveryGateway.findDelivery(any())).thenReturn(delivery);
             when(deliveryGateway.getCustomerId(any())).thenReturn(UUID.fromString("d295ee33-99c1-4214-9eaf-77e79cdc3e23"));
             when(deliveryGateway.updateDelivery(any())).thenReturn(delivery);
+            when(directionsUseCase.calculateRoute(anyString())).thenReturn(Duration.ofMinutes(40).getSeconds());
             ResponseEntity<?> response = deliveryController.createDelivery(deliveryDTO);
             assertEquals(HttpStatus.CREATED, response.getStatusCode());
         }
